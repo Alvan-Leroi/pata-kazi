@@ -14,6 +14,7 @@ function Home() {
 
   return (
     <div className="home-page">
+      {/* Navigation */}
       <nav className="navbar">
         <div className="navbar-container">
           <Link to="/home" className="logo">
@@ -22,7 +23,11 @@ function Home() {
 
           <div className="nav-links">
             <a href="#services">Services</a>
+
             <a href="#how-it-works">How it works</a>
+
+            <Link to="/account">My Account</Link>
+
             <Link to="/signup">Become a Provider</Link>
           </div>
 
@@ -39,6 +44,7 @@ function Home() {
       </nav>
 
       <main>
+        {/* Hero Section */}
         <section className="hero-section">
           <div className="hero-content">
             <span className="hero-badge">Local services made simple</span>
@@ -73,9 +79,11 @@ function Home() {
           </div>
         </section>
 
+        {/* Services Section */}
         <section className="services-section" id="services">
           <div className="section-heading">
             <p>Popular services</p>
+
             <h2>What do you need help with?</h2>
 
             <span>
@@ -98,9 +106,11 @@ function Home() {
           </div>
         </section>
 
+        {/* How It Works Section */}
         <section className="how-section" id="how-it-works">
           <div className="section-heading">
             <p>How it works</p>
+
             <h2>Getting things done is simple</h2>
           </div>
 
@@ -140,6 +150,7 @@ function Home() {
           </div>
         </section>
 
+        {/* Provider Section */}
         <section className="provider-section">
           <div className="provider-content">
             <div>
@@ -160,10 +171,12 @@ function Home() {
         </section>
       </main>
 
+      {/* Footer */}
       <footer className="footer">
         <div className="footer-container">
           <div>
             <h3>Pata Kazi</h3>
+
             <p>Find work. Find help. Get things done.</p>
           </div>
 
