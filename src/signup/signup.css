@@ -2,63 +2,48 @@
   box-sizing: border-box;
 }
 
-html,
-body,
-#root {
-  margin: 0;
-  padding: 0;
-  width: 100%;
-  min-height: 100vh;
-}
-
-body {
-  font-family: Arial, Helvetica, sans-serif;
-  background: #090909;
-}
-
-.login-page {
+.signup-page {
   width: 100%;
   min-height: 100vh;
 
-  background:
-    radial-gradient(
-      circle at top,
-      #202020 0%,
-      #121212 45%,
-      #080808 100%
-    );
+  background: radial-gradient(
+    circle at top,
+    #202020 0%,
+    #121212 45%,
+    #080808 100%
+  );
 
   display: flex;
   justify-content: center;
   align-items: center;
 
-  padding: 30px 20px;
+  padding: 40px 20px;
 }
 
-.login-container {
+.signup-container {
   width: 100%;
-  max-width: 440px;
+  max-width: 520px;
 }
 
-.login-brand {
+.signup-brand {
   text-align: center;
   margin-bottom: 25px;
 }
 
-.login-brand h1 {
+.signup-brand h1 {
   margin: 0;
   color: #ffffff;
   font-size: 42px;
   font-weight: 800;
 }
 
-.login-brand p {
+.signup-brand p {
   margin-top: 8px;
   color: #aaaaaa;
   font-size: 15px;
 }
 
-.login-card {
+.signup-card {
   background: #141414;
   padding: 40px;
   border-radius: 18px;
@@ -66,16 +51,71 @@ body {
   box-shadow: 0 20px 60px rgba(0, 0, 0, 0.55);
 }
 
-.login-card h2 {
+.signup-card h2 {
   margin: 0 0 8px;
   color: #ffffff;
   font-size: 28px;
 }
 
-.login-subtitle {
+.signup-subtitle {
   margin: 0 0 28px;
   color: #999999;
   font-size: 15px;
+}
+
+.role-section {
+  margin-bottom: 25px;
+}
+
+.role-section p {
+  color: #eeeeee;
+  font-size: 14px;
+  font-weight: 600;
+  margin-bottom: 10px;
+}
+
+.role-options {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+
+.role-card {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  padding: 16px;
+  border: 1px solid #333333;
+  border-radius: 10px;
+  background: #0d0d0d;
+  cursor: pointer;
+  transition: 0.2s ease;
+}
+
+.role-card input {
+  position: absolute;
+  opacity: 0;
+}
+
+.role-card span {
+  color: #ffffff;
+  font-size: 15px;
+  font-weight: 700;
+  margin-bottom: 5px;
+}
+
+.role-card small {
+  color: #888888;
+  font-size: 12px;
+}
+
+.role-card:hover {
+  border-color: #666666;
+}
+
+.active-role {
+  border-color: #ffffff;
+  background: #1b1b1b;
 }
 
 .form-group {
@@ -111,22 +151,6 @@ body {
   box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.05);
 }
 
-.password-label {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
-
-.password-label a {
-  color: #bbbbbb;
-  font-size: 13px;
-  text-decoration: none;
-}
-
-.password-label a:hover {
-  color: #ffffff;
-}
-
 .password-input-wrapper {
   position: relative;
 }
@@ -152,20 +176,20 @@ body {
   color: #ffffff;
 }
 
-.remember-me {
+.terms {
   display: flex;
-  align-items: center;
-  gap: 8px;
+  align-items: flex-start;
+  gap: 9px;
   margin-bottom: 22px;
-  color: #cccccc;
-  font-size: 14px;
+  color: #aaaaaa;
+  font-size: 13px;
 }
 
-.remember-me input {
-  cursor: pointer;
+.terms input {
+  margin-top: 2px;
 }
 
-.login-button {
+.signup-button {
   width: 100%;
   padding: 14px;
   border: none;
@@ -178,7 +202,7 @@ body {
   transition: 0.2s ease;
 }
 
-.login-button:hover {
+.signup-button:hover {
   background: #dddddd;
   transform: translateY(-1px);
 }
@@ -220,41 +244,33 @@ body {
   border-color: #555555;
 }
 
-.signup-text {
+.login-text {
   margin-top: 26px;
   text-align: center;
   color: #999999;
   font-size: 14px;
 }
 
-.signup-text a {
+.login-text a {
   color: #ffffff;
   font-weight: 600;
   text-decoration: none;
 }
 
-.signup-text a:hover {
+.login-text a:hover {
   text-decoration: underline;
 }
 
-@media (max-width: 500px) {
-  .login-page {
-    padding: 20px 15px;
-  }
-
-  .login-card {
+@media (max-width: 600px) {
+  .signup-card {
     padding: 30px 22px;
   }
 
-  .login-brand h1 {
+  .signup-brand h1 {
     font-size: 34px;
   }
 
-  .login-brand p {
-    font-size: 14px;
-  }
-
-  .login-card h2 {
-    font-size: 24px;
+  .role-options {
+    grid-template-columns: 1fr;
   }
 }
