@@ -1,8 +1,10 @@
 import React, { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import "./signup.css";
 
 function Signup() {
+  const navigate = useNavigate();
+
   const [formData, setFormData] = useState({
     fullName: "",
     email: "",
@@ -31,6 +33,9 @@ function Signup() {
     }
 
     console.log("Signup data:", formData);
+
+    // Temporary until backend authentication is added
+    navigate("/home");
   };
 
   return (
@@ -206,6 +211,10 @@ function Signup() {
 
           <p className="login-text">
             Already have an account? <Link to="/">Sign in</Link>
+          </p>
+
+          <p className="home-link-text">
+            <Link to="/home">Continue to homepage</Link>
           </p>
         </div>
       </div>

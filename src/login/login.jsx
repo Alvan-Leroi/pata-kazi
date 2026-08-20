@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import "./login.css";
 
 function Login() {
@@ -9,6 +9,8 @@ function Login() {
   });
 
   const [showPassword, setShowPassword] = useState(false);
+
+  const navigate = useNavigate();
 
   const handleChange = (e) => {
     setFormData({
@@ -21,6 +23,9 @@ function Login() {
     e.preventDefault();
 
     console.log("Login data:", formData);
+
+    // Temporary navigation until backend authentication is added
+    navigate("/home");
   };
 
   return (
@@ -34,9 +39,7 @@ function Login() {
         <div className="login-card">
           <h2>Welcome back</h2>
 
-          <p className="login-subtitle">
-            Sign in to continue to your account.
-          </p>
+          <p className="login-subtitle">Sign in to continue to your account.</p>
 
           <form onSubmit={handleSubmit}>
             <div className="form-group">
@@ -57,9 +60,7 @@ function Login() {
               <div className="password-label">
                 <label htmlFor="password">Password</label>
 
-                <a href="/forgot-password">
-                  Forgot password?
-                </a>
+                <a href="/forgot-password">Forgot password?</a>
               </div>
 
               <div className="password-input-wrapper">
@@ -84,20 +85,12 @@ function Login() {
             </div>
 
             <div className="remember-me">
-              <input
-                type="checkbox"
-                id="remember"
-              />
+              <input type="checkbox" id="remember" />
 
-              <label htmlFor="remember">
-                Remember me
-              </label>
+              <label htmlFor="remember">Remember me</label>
             </div>
 
-            <button
-              type="submit"
-              className="login-button"
-            >
+            <button type="submit" className="login-button">
               Sign in
             </button>
           </form>
@@ -106,18 +99,16 @@ function Login() {
             <span>OR</span>
           </div>
 
-          <button
-            type="button"
-            className="google-button"
-          >
+          <button type="button" className="google-button">
             Continue with Google
           </button>
 
           <p className="signup-text">
-            Don't have an account?{" "}
-            <Link to="/signup">
-              Create account
-            </Link>
+            Don't have an account? <Link to="/signup">Create account</Link>
+          </p>
+
+          <p className="home-link-text">
+            <Link to="/home">Continue to homepage</Link>
           </p>
         </div>
       </div>
