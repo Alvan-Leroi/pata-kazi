@@ -1,0 +1,177 @@
+/* src/pages/Login.css */
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: Arial, Helvetica, sans-serif;
+}
+
+.login-page {
+  min-height: 100vh;
+  background: #f7f8fa;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 20px;
+}
+
+.login-container {
+  width: 100%;
+  max-width: 440px;
+}
+
+.login-brand {
+  text-align: center;
+  margin-bottom: 30px;
+}
+
+.login-brand h1 {
+  margin: 0;
+  font-size: 36px;
+  color: #0d7a5f;
+}
+
+.login-brand p {
+  margin-top: 8px;
+  color: #666;
+}
+
+.login-card {
+  background: white;
+  padding: 40px;
+  border-radius: 16px;
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.08);
+}
+
+.login-card h2 {
+  margin-top: 0;
+  margin-bottom: 8px;
+  font-size: 26px;
+  color: #222;
+}
+
+.login-subtitle {
+  margin-top: 0;
+  margin-bottom: 28px;
+  color: #777;
+}
+
+.form-group {
+  margin-bottom: 20px;
+}
+
+.form-group label {
+  display: block;
+  font-weight: 600;
+  margin-bottom: 8px;
+  color: #333;
+}
+
+.form-group input {
+  width: 100%;
+  padding: 14px;
+  border: 1px solid #d7d7d7;
+  border-radius: 8px;
+  font-size: 15px;
+  outline: none;
+  transition: 0.2s;
+}
+
+.form-group input:focus {
+  border-color: #0d7a5f;
+}
+
+.password-label {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.password-label a {
+  font-size: 14px;
+  text-decoration: none;
+  color: #0d7a5f;
+}
+
+.remember-me {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 22px;
+  color: #555;
+}
+
+.login-button {
+  width: 100%;
+  padding: 14px;
+  border: none;
+  border-radius: 8px;
+  background: #0d7a5f;
+  color: white;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.login-button:hover {
+  background: #09634d;
+}
+
+.divider {
+  display: flex;
+  align-items: center;
+  margin: 25px 0;
+  color: #999;
+  font-size: 13px;
+}
+
+.divider::before,
+.divider::after {
+  content: "";
+  flex: 1;
+  height: 1px;
+  background: #ddd;
+}
+
+.divider span {
+  padding: 0 15px;
+}
+
+.google-button {
+  width: 100%;
+  padding: 14px;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  background: white;
+  font-size: 15px;
+  cursor: pointer;
+}
+
+.google-button:hover {
+  background: #f5f5f5;
+}
+
+.signup-text {
+  margin-top: 28px;
+  text-align: center;
+  color: #666;
+}
+
+.signup-text a {
+  color: #0d7a5f;
+  text-decoration: none;
+  font-weight: 600;
+}
+
+@media (max-width: 500px) {
+  .login-card {
+    padding: 28px 22px;
+  }
+
+  .login-brand h1 {
+    font-size: 30px;
+  }
+}
