@@ -12,9 +12,8 @@ body,
 }
 
 body {
-  overflow-x: hidden;
   font-family: Arial, Helvetica, sans-serif;
-  background: #000;
+  background: #090909;
 }
 
 .login-page {
@@ -23,9 +22,9 @@ body {
 
   background: radial-gradient(
     circle at top,
-    #1f1f1f 0%,
+    #202020 0%,
     #121212 45%,
-    #090909 100%
+    #080808 100%
   );
 
   display: flex;
@@ -38,9 +37,6 @@ body {
 .login-container {
   width: 100%;
   max-width: 440px;
-
-  position: relative;
-  z-index: 2;
 }
 
 .login-brand {
@@ -50,14 +46,18 @@ body {
 
 .login-brand h1 {
   margin: 0;
+
   color: #ffffff;
+
   font-size: 42px;
   font-weight: 800;
 }
 
 .login-brand p {
   margin-top: 8px;
-  color: #a9a9a9;
+
+  color: #aaaaaa;
+
   font-size: 15px;
 }
 
@@ -70,7 +70,7 @@ body {
 
   border: 1px solid #2b2b2b;
 
-  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.55);
 }
 
 .login-card h2 {
@@ -84,7 +84,7 @@ body {
 .login-subtitle {
   margin: 0 0 28px;
 
-  color: #aaaaaa;
+  color: #999999;
 
   font-size: 15px;
 }
@@ -110,9 +110,10 @@ body {
   padding: 14px 15px;
 
   border: 1px solid #3a3a3a;
+
   border-radius: 9px;
 
-  background: rgba(0, 0, 0, 0.8);
+  background: #090909;
 
   color: #ffffff;
 
@@ -124,23 +125,25 @@ body {
 }
 
 .form-group input::placeholder {
-  color: #777777;
+  color: #6f6f6f;
 }
 
 .form-group input:focus {
-  border-color: #ffffff;
+  border-color: #777777;
 
-  box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.08);
+  box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.05);
 }
 
 .password-label {
   display: flex;
+
   justify-content: space-between;
+
   align-items: center;
 }
 
 .password-label a {
-  color: #cccccc;
+  color: #bbbbbb;
 
   font-size: 13px;
 
@@ -151,8 +154,43 @@ body {
   color: #ffffff;
 }
 
+.password-input-wrapper {
+  position: relative;
+}
+
+.password-input-wrapper input {
+  padding-right: 75px;
+}
+
+.show-password-button {
+  position: absolute;
+
+  right: 12px;
+
+  top: 50%;
+
+  transform: translateY(-50%);
+
+  border: none;
+
+  background: transparent;
+
+  color: #aaaaaa;
+
+  font-size: 13px;
+
+  font-weight: 600;
+
+  cursor: pointer;
+}
+
+.show-password-button:hover {
+  color: #ffffff;
+}
+
 .remember-me {
   display: flex;
+
   align-items: center;
 
   gap: 8px;
@@ -164,12 +202,17 @@ body {
   font-size: 14px;
 }
 
+.remember-me input {
+  cursor: pointer;
+}
+
 .login-button {
   width: 100%;
 
   padding: 14px;
 
   border: none;
+
   border-radius: 9px;
 
   background: #ffffff;
@@ -177,6 +220,7 @@ body {
   color: #111111;
 
   font-size: 16px;
+
   font-weight: 700;
 
   cursor: pointer;
@@ -192,6 +236,7 @@ body {
 
 .divider {
   display: flex;
+
   align-items: center;
 
   margin: 25px 0;
@@ -209,7 +254,7 @@ body {
 
   height: 1px;
 
-  background: #3a3a3a;
+  background: #333333;
 }
 
 .divider span {
@@ -222,9 +267,10 @@ body {
   padding: 14px;
 
   border: 1px solid #3a3a3a;
+
   border-radius: 9px;
 
-  background: rgba(0, 0, 0, 0.75);
+  background: #090909;
 
   color: #ffffff;
 
@@ -237,7 +283,8 @@ body {
 
 .google-button:hover {
   background: #202020;
-  border-color: #666666;
+
+  border-color: #555555;
 }
 
 .signup-text {
@@ -262,11 +309,9 @@ body {
   text-decoration: underline;
 }
 
-@media (max-width: 600px) {
+@media (max-width: 500px) {
   .login-page {
     padding: 20px 15px;
-
-    background-position: center;
   }
 
   .login-card {
@@ -275,5 +320,13 @@ body {
 
   .login-brand h1 {
     font-size: 34px;
+  }
+
+  .login-brand p {
+    font-size: 14px;
+  }
+
+  .login-card h2 {
+    font-size: 24px;
   }
 }
