@@ -1,7 +1,5 @@
-// src/pages/Login.jsx
-
 import React, { useState } from "react";
-import "./Login.css";
+import "./login.css";
 
 function Login() {
   const [formData, setFormData] = useState({
@@ -20,30 +18,30 @@ function Login() {
     e.preventDefault();
 
     console.log("Login data:", formData);
-
-    // Later, we will connect this to the backend
   };
 
   return (
     <div className="login-page">
       <div className="login-container">
         <div className="login-brand">
-          <h1>TaskLink</h1>
-          <p>Find help. Get things done.</p>
+          <h1>Pata Kazi</h1>
+          <p>Find work. Find help. Get things done.</p>
         </div>
 
         <div className="login-card">
           <h2>Welcome back</h2>
+
           <p className="login-subtitle">Sign in to continue to your account.</p>
 
           <form onSubmit={handleSubmit}>
             <div className="form-group">
-              <label>Email address</label>
+              <label htmlFor="email">Email address</label>
 
               <input
+                id="email"
                 type="email"
                 name="email"
-                placeholder="you@example.com"
+                placeholder="Enter your email"
                 value={formData.email}
                 onChange={handleChange}
                 required
@@ -52,12 +50,13 @@ function Login() {
 
             <div className="form-group">
               <div className="password-label">
-                <label>Password</label>
+                <label htmlFor="password">Password</label>
 
                 <a href="/forgot-password">Forgot password?</a>
               </div>
 
               <input
+                id="password"
                 type="password"
                 name="password"
                 placeholder="Enter your password"
@@ -69,6 +68,7 @@ function Login() {
 
             <div className="remember-me">
               <input type="checkbox" id="remember" />
+
               <label htmlFor="remember">Remember me</label>
             </div>
 
@@ -81,7 +81,9 @@ function Login() {
             <span>OR</span>
           </div>
 
-          <button className="google-button">Continue with Google</button>
+          <button type="button" className="google-button">
+            Continue with Google
+          </button>
 
           <p className="signup-text">
             Don't have an account? <a href="/register">Create account</a>
