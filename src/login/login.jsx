@@ -3,14 +3,16 @@ import { Link, useNavigate } from "react-router-dom";
 import "./login.css";
 
 function Login() {
+  const navigate = useNavigate();
+
   const [formData, setFormData] = useState({
     email: "",
     password: "",
   });
 
   const [showPassword, setShowPassword] = useState(false);
-
-  const navigate = useNavigate();
+  const [message, setMessage] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
 
   const handleChange = (e) => {
     setFormData({
@@ -19,13 +21,52 @@ function Login() {
     });
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
 
-    console.log("Login data:", formData);
+    setMessage("");
 
-    // Temporary navigation until backend authentication is added
-    navigate("/home");
+    try {
+      setIsLoading(true);
+
+      const response = await fetch("http://localhost:5000/api/auth/login", {
+        method: "POST",
+
+        headers: {
+          "Content-Type": "application/json",
+        },
+
+        body: JSON.stringify({
+          email: formData.email,
+          password: formData.password,
+        }),
+      });
+
+      const data = await response.json();
+
+      console.log("LOGIN RESPONSE:", data);
+
+      if (!response.ok) {
+        setMessage(data.message || "Unable to sign in.");
+        return;
+      }
+
+      // Save login token
+      localStorage.setItem("pataKaziToken", data.token);
+
+      // Save basic user details
+      localStorage.setItem("pataKaziUser", JSON.stringify(data.user));
+
+      setMessage("Login successful!");
+
+      navigate("/home");
+    } catch (error) {
+      console.error("Login error:", error);
+
+      setMessage("Unable to connect to the server. Please try again.");
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -40,6 +81,8 @@ function Login() {
           <h2>Welcome back</h2>
 
           <p className="login-subtitle">Sign in to continue to your account.</p>
+
+          {message && <div className="login-message">{message}</div>}
 
           <form onSubmit={handleSubmit}>
             <div className="form-group">
@@ -90,8 +133,8 @@ function Login() {
               <label htmlFor="remember">Remember me</label>
             </div>
 
-            <button type="submit" className="login-button">
-              Sign in
+            <button type="submit" className="login-button" disabled={isLoading}>
+              {isLoading ? "Signing in..." : "Sign in"}
             </button>
           </form>
 
@@ -105,10 +148,6 @@ function Login() {
 
           <p className="signup-text">
             Don't have an account? <Link to="/signup">Create account</Link>
-          </p>
-
-          <p className="home-link-text">
-            <Link to="/home">Continue to homepage</Link>
           </p>
         </div>
       </div>
