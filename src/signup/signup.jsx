@@ -17,6 +17,9 @@ function Signup() {
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
+  const [message, setMessage] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
+
   const handleChange = (e) => {
     setFormData({
       ...formData,
@@ -24,18 +27,56 @@ function Signup() {
     });
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
 
+    setMessage("");
+
     if (formData.password !== formData.confirmPassword) {
-      alert("Passwords do not match.");
+      setMessage("Passwords do not match.");
       return;
     }
 
-    console.log("Signup data:", formData);
+    try {
+      setIsLoading(true);
 
-    // Temporary until backend authentication is added
-    navigate("/home");
+      const response = await fetch("http://localhost:5000/api/auth/register", {
+        method: "POST",
+
+        headers: {
+          "Content-Type": "application/json",
+        },
+
+        body: JSON.stringify({
+          fullName: formData.fullName,
+          email: formData.email,
+          phone: formData.phone,
+          password: formData.password,
+          role: formData.role,
+        }),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        setMessage(data.message || "Unable to create account.");
+        return;
+      }
+
+      setMessage("Account created successfully.");
+
+      console.log("Created user:", data);
+
+      setTimeout(() => {
+        navigate("/");
+      }, 1000);
+    } catch (error) {
+      console.error("Signup error:", error);
+
+      setMessage("Unable to connect to the server. Please try again.");
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -52,6 +93,8 @@ function Signup() {
           <p className="signup-subtitle">
             Join Pata Kazi and get started today.
           </p>
+
+          {message && <div className="signup-message">{message}</div>}
 
           <form onSubmit={handleSubmit}>
             <div className="role-section">
@@ -196,8 +239,12 @@ function Signup() {
               </label>
             </div>
 
-            <button type="submit" className="signup-button">
-              Create account
+            <button
+              type="submit"
+              className="signup-button"
+              disabled={isLoading}
+            >
+              {isLoading ? "Creating account..." : "Create account"}
             </button>
           </form>
 
