@@ -58,18 +58,19 @@ function Signup() {
 
       const data = await response.json();
 
+      console.log("SIGNUP RESPONSE:", data);
+
       if (!response.ok) {
         setMessage(data.message || "Unable to create account.");
+
         return;
       }
 
-      setMessage("Account created successfully.");
-
-      console.log("Created user:", data);
+      setMessage("Account created successfully!");
 
       setTimeout(() => {
         navigate("/");
-      }, 1000);
+      }, 1200);
     } catch (error) {
       console.error("Signup error:", error);
 
@@ -84,6 +85,7 @@ function Signup() {
       <div className="signup-container">
         <div className="signup-brand">
           <h1>Pata Kazi</h1>
+
           <p>Find work. Find help. Get things done.</p>
         </div>
 
@@ -97,6 +99,8 @@ function Signup() {
           {message && <div className="signup-message">{message}</div>}
 
           <form onSubmit={handleSubmit}>
+            {/* Account Type */}
+
             <div className="role-section">
               <p>I want to:</p>
 
@@ -117,6 +121,7 @@ function Signup() {
                   />
 
                   <span>Hire someone</span>
+
                   <small>I need help with a task</small>
                 </label>
 
@@ -136,10 +141,13 @@ function Signup() {
                   />
 
                   <span>Find work</span>
+
                   <small>I want to offer services</small>
                 </label>
               </div>
             </div>
+
+            {/* Full Name */}
 
             <div className="form-group">
               <label htmlFor="fullName">Full name</label>
@@ -155,6 +163,8 @@ function Signup() {
               />
             </div>
 
+            {/* Email */}
+
             <div className="form-group">
               <label htmlFor="email">Email address</label>
 
@@ -169,6 +179,8 @@ function Signup() {
               />
             </div>
 
+            {/* Phone */}
+
             <div className="form-group">
               <label htmlFor="phone">Phone number</label>
 
@@ -182,6 +194,8 @@ function Signup() {
                 required
               />
             </div>
+
+            {/* Password */}
 
             <div className="form-group">
               <label htmlFor="password">Password</label>
@@ -207,6 +221,8 @@ function Signup() {
               </div>
             </div>
 
+            {/* Confirm Password */}
+
             <div className="form-group">
               <label htmlFor="confirmPassword">Confirm password</label>
 
@@ -231,13 +247,21 @@ function Signup() {
               </div>
             </div>
 
+            {/* Terms */}
+
             <div className="terms">
               <input type="checkbox" id="terms" required />
 
               <label htmlFor="terms">
-                I agree to the Terms of Service and Privacy Policy
+                I agree to the{" "}
+                <Link to="/terms" className="terms-link">
+                  Terms & Conditions
+                </Link>{" "}
+                and Privacy Policy
               </label>
             </div>
+
+            {/* Create Account Button */}
 
             <button
               type="submit"

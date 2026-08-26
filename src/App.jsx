@@ -4,6 +4,7 @@ import Login from "./login/login";
 import Signup from "./signup/signup";
 import Home from "./home/home";
 import Account from "./account/account";
+import Terms from "./terms/terms";
 
 function App() {
   return (
@@ -13,6 +14,7 @@ function App() {
         <Route path="/signup" element={<Signup />} />
         <Route path="/home" element={<Home />} />
         <Route path="/account" element={<Account />} />
+        <Route path="/terms" element={<Terms />} />
       </Routes>
     </BrowserRouter>
   );

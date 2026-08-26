@@ -17,12 +17,14 @@ body {
   font-family: Arial, Helvetica, sans-serif;
 }
 
+/* NAVBAR */
+
 .navbar {
   position: sticky;
   top: 0;
   z-index: 100;
 
-  background: rgba(9, 9, 9, 0.92);
+  background: rgba(9, 9, 9, 0.94);
 
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
@@ -102,15 +104,18 @@ body {
   text-decoration: none;
 }
 
+/* HERO */
+
 .hero-section {
   min-height: 650px;
 
-  background: radial-gradient(
-    circle at top center,
-    #242424 0%,
-    #131313 35%,
-    #090909 70%
-  );
+  background:
+    linear-gradient(rgba(0, 0, 0, 0.52), rgba(0, 0, 0, 0.72)),
+    url("https://i.pinimg.com/1200x/6f/f7/31/6ff73199332b81f3d8676680c64a1b0f.jpg");
+
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
 
   display: flex;
   align-items: center;
@@ -133,14 +138,16 @@ body {
 
   padding: 8px 13px;
 
-  border: 1px solid #3b3b3b;
+  border: 1px solid rgba(255, 255, 255, 0.22);
   border-radius: 30px;
 
-  background: #151515;
+  background: rgba(10, 10, 10, 0.62);
 
-  color: #bbbbbb;
+  color: #dddddd;
 
   font-size: 13px;
+
+  backdrop-filter: blur(8px);
 }
 
 .hero-content h1 {
@@ -152,10 +159,12 @@ body {
   line-height: 1.05;
 
   letter-spacing: -2px;
+
+  text-shadow: 0 4px 22px rgba(0, 0, 0, 0.85);
 }
 
 .hero-content h1 span {
-  color: #9d9d9d;
+  color: #c5c5c5;
 }
 
 .hero-content > p {
@@ -163,10 +172,12 @@ body {
 
   margin: 24px auto 0;
 
-  color: #a5a5a5;
+  color: #e0e0e0;
 
   font-size: 18px;
   line-height: 1.7;
+
+  text-shadow: 0 3px 14px rgba(0, 0, 0, 0.85);
 }
 
 .hero-actions {
@@ -188,6 +199,8 @@ body {
   font-weight: 700;
 
   text-decoration: none;
+
+  transition: 0.2s ease;
 }
 
 .primary-button {
@@ -195,12 +208,26 @@ body {
   color: #111111;
 }
 
+.primary-button:hover {
+  background: #dddddd;
+  transform: translateY(-1px);
+}
+
 .secondary-button {
-  background: #151515;
+  background: rgba(15, 15, 15, 0.78);
   color: #ffffff;
 
-  border: 1px solid #343434;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+
+  backdrop-filter: blur(8px);
 }
+
+.secondary-button:hover {
+  background: rgba(30, 30, 30, 0.9);
+  transform: translateY(-1px);
+}
+
+/* SEARCH */
 
 .search-box {
   max-width: 800px;
@@ -214,12 +241,14 @@ body {
 
   gap: 8px;
 
-  background: #151515;
+  background: rgba(15, 15, 15, 0.85);
 
-  border: 1px solid #303030;
+  border: 1px solid rgba(255, 255, 255, 0.16);
   border-radius: 14px;
 
-  box-shadow: 0 15px 50px rgba(0, 0, 0, 0.4);
+  box-shadow: 0 15px 50px rgba(0, 0, 0, 0.5);
+
+  backdrop-filter: blur(12px);
 }
 
 .search-box input {
@@ -229,7 +258,7 @@ body {
 
   border: none;
 
-  background: #0b0b0b;
+  background: rgba(5, 5, 5, 0.88);
 
   color: #ffffff;
 
@@ -241,7 +270,7 @@ body {
 }
 
 .search-box input::placeholder {
-  color: #666666;
+  color: #777777;
 }
 
 .search-box button {
@@ -256,7 +285,15 @@ body {
   font-weight: 700;
 
   cursor: pointer;
+
+  transition: 0.2s ease;
 }
+
+.search-box button:hover {
+  background: #dddddd;
+}
+
+/* SERVICES */
 
 .services-section {
   max-width: 1200px;
@@ -375,6 +412,8 @@ body {
   cursor: pointer;
 }
 
+/* HOW IT WORKS */
+
 .how-section {
   padding: 100px 25px;
 
@@ -431,6 +470,8 @@ body {
   line-height: 1.7;
 }
 
+/* PROVIDER SECTION */
+
 .provider-section {
   max-width: 1200px;
 
@@ -451,6 +492,7 @@ body {
   background: linear-gradient(135deg, #1c1c1c, #101010);
 
   border: 1px solid #303030;
+
   border-radius: 18px;
 }
 
@@ -496,7 +538,17 @@ body {
   font-weight: 700;
 
   text-decoration: none;
+
+  transition: 0.2s ease;
 }
+
+.provider-button:hover {
+  background: #dddddd;
+
+  transform: translateY(-1px);
+}
+
+/* FOOTER */
 
 .footer {
   border-top: 1px solid #222222;
@@ -530,6 +582,8 @@ body {
   font-size: 13px;
 }
 
+/* TABLET */
+
 @media (max-width: 850px) {
   .nav-links {
     display: none;
@@ -549,9 +603,12 @@ body {
 
   .provider-content {
     flex-direction: column;
+
     align-items: flex-start;
   }
 }
+
+/* MOBILE */
 
 @media (max-width: 600px) {
   .navbar-container {
@@ -570,6 +627,8 @@ body {
     min-height: auto;
 
     padding: 80px 18px;
+
+    background-position: center;
   }
 
   .hero-content h1 {
@@ -618,6 +677,7 @@ body {
 
   .footer-container {
     flex-direction: column;
+
     align-items: flex-start;
   }
 }

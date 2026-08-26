@@ -292,3 +292,33 @@
   opacity: 0.6;
   cursor: not-allowed;
 }
+.terms-link {
+  color: #ffffff;
+  font-weight: 600;
+  text-decoration: underline;
+}
+
+.terms-link:hover {
+  color: #cccccc;
+}
+
+.signup-message {
+  margin-bottom: 20px;
+
+  padding: 12px 14px;
+
+  border: 1px solid #3a3a3a;
+
+  border-radius: 8px;
+
+  background: #0d0d0d;
+
+  color: #dddddd;
+
+  font-size: 14px;
+}
+
+.signup-button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
