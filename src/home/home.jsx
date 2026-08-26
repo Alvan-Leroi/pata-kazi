@@ -1,8 +1,16 @@
 import React from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import "./home.css";
 
 function Home() {
+  const navigate = useNavigate();
+
+  const token = localStorage.getItem("pataKaziToken");
+
+  const savedUser = JSON.parse(localStorage.getItem("pataKaziUser"));
+
+  const isLoggedIn = !!token;
+
   const categories = [
     "Cleaning",
     "Moving",
@@ -12,9 +20,16 @@ function Home() {
     "Yard Work",
   ];
 
+  const handleLogout = () => {
+    localStorage.removeItem("pataKaziToken");
+    localStorage.removeItem("pataKaziUser");
+
+    navigate("/");
+  };
+
   return (
     <div className="home-page">
-      {/* Navigation */}
+      {/* NAVBAR */}
       <nav className="navbar">
         <div className="navbar-container">
           <Link to="/home" className="logo">
@@ -26,25 +41,43 @@ function Home() {
 
             <a href="#how-it-works">How it works</a>
 
-            <Link to="/account">My Account</Link>
+            {isLoggedIn && <Link to="/account">My Account</Link>}
 
-            <Link to="/signup">Become a Provider</Link>
+            {!isLoggedIn && <Link to="/signup">Become a Provider</Link>}
           </div>
 
           <div className="nav-actions">
-            <Link to="/" className="login-link">
-              Sign in
-            </Link>
+            {isLoggedIn ? (
+              <>
+                <Link to="/account" className="login-link">
+                  {savedUser?.fullName || "My Account"}
+                </Link>
 
-            <Link to="/signup" className="signup-nav-button">
-              Get started
-            </Link>
+                <button
+                  type="button"
+                  className="logout-home-button"
+                  onClick={handleLogout}
+                >
+                  Log out
+                </button>
+              </>
+            ) : (
+              <>
+                <Link to="/" className="login-link">
+                  Sign in
+                </Link>
+
+                <Link to="/signup" className="signup-nav-button">
+                  Get started
+                </Link>
+              </>
+            )}
           </div>
         </div>
       </nav>
 
       <main>
-        {/* Hero Section */}
+        {/* HERO */}
         <section className="hero-section">
           <div className="hero-content">
             <span className="hero-badge">Local services made simple</span>
@@ -60,11 +93,17 @@ function Home() {
             </p>
 
             <div className="hero-actions">
-              <Link to="/signup" className="primary-button">
+              <Link
+                to={isLoggedIn ? "/account" : "/signup"}
+                className="primary-button"
+              >
                 Find someone
               </Link>
 
-              <Link to="/signup" className="secondary-button">
+              <Link
+                to={isLoggedIn ? "/account" : "/signup"}
+                className="secondary-button"
+              >
                 Find work
               </Link>
             </div>
@@ -79,7 +118,7 @@ function Home() {
           </div>
         </section>
 
-        {/* Services Section */}
+        {/* SERVICES */}
         <section className="services-section" id="services">
           <div className="section-heading">
             <p>Popular services</p>
@@ -106,7 +145,7 @@ function Home() {
           </div>
         </section>
 
-        {/* How It Works Section */}
+        {/* HOW IT WORKS */}
         <section className="how-section" id="how-it-works">
           <div className="section-heading">
             <p>How it works</p>
@@ -150,7 +189,7 @@ function Home() {
           </div>
         </section>
 
-        {/* Provider Section */}
+        {/* PROVIDER SECTION */}
         <section className="provider-section">
           <div className="provider-content">
             <div>
@@ -164,14 +203,17 @@ function Home() {
               </p>
             </div>
 
-            <Link to="/signup" className="provider-button">
+            <Link
+              to={isLoggedIn ? "/account" : "/signup"}
+              className="provider-button"
+            >
               Become a provider
             </Link>
           </div>
         </section>
       </main>
 
-      {/* Footer */}
+      {/* FOOTER */}
       <footer className="footer">
         <div className="footer-container">
           <div>

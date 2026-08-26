@@ -5,6 +5,8 @@ import "./signup.css";
 function Signup() {
   const navigate = useNavigate();
 
+  const API_URL = import.meta.env.VITE_API_URL;
+
   const [formData, setFormData] = useState({
     fullName: "",
     email: "",
@@ -15,6 +17,7 @@ function Signup() {
   });
 
   const [showPassword, setShowPassword] = useState(false);
+
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
   const [message, setMessage] = useState("");
@@ -34,13 +37,14 @@ function Signup() {
 
     if (formData.password !== formData.confirmPassword) {
       setMessage("Passwords do not match.");
+
       return;
     }
 
-    try {
-      setIsLoading(true);
+    setIsLoading(true);
 
-      const response = await fetch("http://localhost:5000/api/auth/register", {
+    try {
+      const response = await fetch(`${API_URL}/api/auth/register`, {
         method: "POST",
 
         headers: {
@@ -99,8 +103,6 @@ function Signup() {
           {message && <div className="signup-message">{message}</div>}
 
           <form onSubmit={handleSubmit}>
-            {/* Account Type */}
-
             <div className="role-section">
               <p>I want to:</p>
 
@@ -147,8 +149,6 @@ function Signup() {
               </div>
             </div>
 
-            {/* Full Name */}
-
             <div className="form-group">
               <label htmlFor="fullName">Full name</label>
 
@@ -162,8 +162,6 @@ function Signup() {
                 required
               />
             </div>
-
-            {/* Email */}
 
             <div className="form-group">
               <label htmlFor="email">Email address</label>
@@ -179,8 +177,6 @@ function Signup() {
               />
             </div>
 
-            {/* Phone */}
-
             <div className="form-group">
               <label htmlFor="phone">Phone number</label>
 
@@ -194,8 +190,6 @@ function Signup() {
                 required
               />
             </div>
-
-            {/* Password */}
 
             <div className="form-group">
               <label htmlFor="password">Password</label>
@@ -221,8 +215,6 @@ function Signup() {
               </div>
             </div>
 
-            {/* Confirm Password */}
-
             <div className="form-group">
               <label htmlFor="confirmPassword">Confirm password</label>
 
@@ -247,8 +239,6 @@ function Signup() {
               </div>
             </div>
 
-            {/* Terms */}
-
             <div className="terms">
               <input type="checkbox" id="terms" required />
 
@@ -260,8 +250,6 @@ function Signup() {
                 and Privacy Policy
               </label>
             </div>
-
-            {/* Create Account Button */}
 
             <button
               type="submit"
@@ -292,5 +280,4 @@ function Signup() {
     </div>
   );
 }
-
 export default Signup;

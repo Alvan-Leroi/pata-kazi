@@ -5,6 +5,8 @@ import "./login.css";
 function Login() {
   const navigate = useNavigate();
 
+  const API_URL = import.meta.env.VITE_API_URL;
+
   const [formData, setFormData] = useState({
     email: "",
     password: "",
@@ -25,11 +27,10 @@ function Login() {
     e.preventDefault();
 
     setMessage("");
+    setIsLoading(true);
 
     try {
-      setIsLoading(true);
-
-      const response = await fetch("http://localhost:5000/api/auth/login", {
+      const response = await fetch(`${API_URL}/api/auth/login`, {
         method: "POST",
 
         headers: {
@@ -51,10 +52,10 @@ function Login() {
         return;
       }
 
-      // Save login token
+      // Store authentication token
       localStorage.setItem("pataKaziToken", data.token);
 
-      // Save basic user details
+      // Store basic user information
       localStorage.setItem("pataKaziUser", JSON.stringify(data.user));
 
       setMessage("Login successful!");
@@ -74,6 +75,7 @@ function Login() {
       <div className="login-container">
         <div className="login-brand">
           <h1>Pata Kazi</h1>
+
           <p>Find work. Find help. Get things done.</p>
         </div>
 
