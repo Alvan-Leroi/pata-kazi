@@ -1,0 +1,185 @@
+* {
+  box-sizing: border-box;
+}
+
+.post-task-page {
+  min-height: 100vh;
+
+  background: radial-gradient(
+    circle at top,
+    #202020 0%,
+    #111111 45%,
+    #080808 100%
+  );
+
+  color: #ffffff;
+
+  font-family: Arial, Helvetica, sans-serif;
+
+  padding: 60px 20px;
+}
+
+.post-task-container {
+  width: 100%;
+  max-width: 760px;
+
+  margin: 0 auto;
+}
+
+.post-task-heading {
+  margin-bottom: 30px;
+}
+
+.post-task-label {
+  margin: 0 0 8px;
+
+  color: #777777;
+
+  font-size: 13px;
+  font-weight: 700;
+
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
+}
+
+.post-task-heading h1 {
+  margin: 0;
+
+  font-size: 42px;
+}
+
+.post-task-heading > p:last-child {
+  margin-top: 12px;
+
+  color: #999999;
+
+  line-height: 1.7;
+}
+
+.post-task-card {
+  background: #131313;
+
+  border: 1px solid #292929;
+
+  border-radius: 16px;
+
+  padding: 35px;
+}
+
+.task-message {
+  margin-bottom: 22px;
+
+  padding: 12px 14px;
+
+  background: #0d0d0d;
+
+  border: 1px solid #353535;
+
+  border-radius: 8px;
+
+  color: #dddddd;
+
+  font-size: 14px;
+}
+
+.task-form-group {
+  display: flex;
+
+  flex-direction: column;
+
+  gap: 8px;
+
+  margin-bottom: 20px;
+}
+
+.task-form-group label {
+  color: #eeeeee;
+
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.task-form-group input,
+.task-form-group select,
+.task-form-group textarea {
+  width: 100%;
+
+  padding: 14px 15px;
+
+  border: 1px solid #353535;
+
+  border-radius: 9px;
+
+  background: #090909;
+
+  color: #ffffff;
+
+  font-size: 14px;
+
+  outline: none;
+}
+
+.task-form-group textarea {
+  resize: vertical;
+}
+
+.task-form-group input:focus,
+.task-form-group select:focus,
+.task-form-group textarea:focus {
+  border-color: #777777;
+}
+
+.task-form-grid {
+  display: grid;
+
+  grid-template-columns: 1fr 1fr;
+
+  gap: 18px;
+}
+
+.post-task-button {
+  width: 100%;
+
+  padding: 14px;
+
+  border: none;
+
+  border-radius: 9px;
+
+  background: #ffffff;
+
+  color: #111111;
+
+  font-size: 16px;
+  font-weight: 700;
+
+  cursor: pointer;
+}
+
+.post-task-button:hover {
+  background: #dddddd;
+}
+
+.post-task-button:disabled {
+  opacity: 0.6;
+
+  cursor: not-allowed;
+}
+
+@media (max-width: 600px) {
+  .post-task-page {
+    padding: 40px 15px;
+  }
+
+  .post-task-card {
+    padding: 25px 20px;
+  }
+
+  .post-task-heading h1 {
+    font-size: 34px;
+  }
+
+  .task-form-grid {
+    grid-template-columns: 1fr;
+  }
+}

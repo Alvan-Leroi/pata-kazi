@@ -1,23 +1,237 @@
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import React from "react";
+import { Link, useNavigate } from "react-router-dom";
+import "./home.css";
 
-import Login from "./login/login";
-import Signup from "./signup/signup";
-import Home from "./home/home";
-import Account from "./account/account";
-import Terms from "./terms/terms";
+function Home() {
+  const navigate = useNavigate();
 
-function App() {
+  const token = localStorage.getItem("pataKaziToken");
+
+  const savedUser = JSON.parse(localStorage.getItem("pataKaziUser"));
+
+  const isLoggedIn = !!token;
+
+  const categories = [
+    "Cleaning",
+    "Moving",
+    "Furniture Assembly",
+    "Handyman",
+    "Delivery",
+    "Yard Work",
+  ];
+
+  const handleLogout = () => {
+    localStorage.removeItem("pataKaziToken");
+    localStorage.removeItem("pataKaziUser");
+
+    navigate("/");
+  };
+
   return (
-    <BrowserRouter>
-      <Routes>
-        <Route path="/" element={<Login />} />
-        <Route path="/signup" element={<Signup />} />
-        <Route path="/home" element={<Home />} />
-        <Route path="/account" element={<Account />} />
-        <Route path="/terms" element={<Terms />} />
-      </Routes>
-    </BrowserRouter>
+    <div className="home-page">
+      {/* NAVBAR */}
+      <nav className="navbar">
+        <div className="navbar-container">
+          <Link to="/home" className="logo">
+            Pata Kazi
+          </Link>
+
+          <div className="nav-links">
+            <a href="#services">Services</a>
+
+            <a href="#how-it-works">How it works</a>
+
+            {isLoggedIn && <Link to="/account">My Account</Link>}
+
+            {!isLoggedIn && <Link to="/signup">Become a Provider</Link>}
+          </div>
+
+          <div className="nav-actions">
+            {isLoggedIn ? (
+              <>
+                <Link to="/account" className="login-link">
+                  {savedUser?.fullName || "My Account"}
+                </Link>
+
+                <button
+                  type="button"
+                  className="logout-home-button"
+                  onClick={handleLogout}
+                >
+                  Log out
+                </button>
+              </>
+            ) : (
+              <>
+                <Link to="/" className="login-link">
+                  Sign in
+                </Link>
+
+                <Link to="/signup" className="signup-nav-button">
+                  Get started
+                </Link>
+              </>
+            )}
+          </div>
+        </div>
+      </nav>
+
+      <main>
+        {/* HERO */}
+        <section className="hero-section">
+          <div className="hero-content">
+            <span className="hero-badge">Local services made simple</span>
+
+            <h1>
+              Get help with the things
+              <span> you need done.</span>
+            </h1>
+
+            <p>
+              Connect with trusted local service providers for everyday tasks,
+              projects, and jobs.
+            </p>
+
+            <div className="hero-actions">
+              <Link
+                to={isLoggedIn ? "/post-task" : "/signup"}
+                className="primary-button"
+              >
+                Find someone
+              </Link>
+
+              <Link
+                to={isLoggedIn ? "/account" : "/signup"}
+                className="secondary-button"
+              >
+                Find work
+              </Link>
+            </div>
+
+            <div className="search-box">
+              <input type="text" placeholder="What service do you need?" />
+
+              <input type="text" placeholder="Enter your location" />
+
+              <button type="button">Search</button>
+            </div>
+          </div>
+        </section>
+
+        {/* SERVICES */}
+        <section className="services-section" id="services">
+          <div className="section-heading">
+            <p>Popular services</p>
+
+            <h2>What do you need help with?</h2>
+
+            <span>
+              Browse some of the most popular services available on Pata Kazi.
+            </span>
+          </div>
+
+          <div className="services-grid">
+            {categories.map((category) => (
+              <div className="service-card" key={category}>
+                <div className="service-icon">{category.charAt(0)}</div>
+
+                <h3>{category}</h3>
+
+                <p>Find trusted providers near you.</p>
+
+                <Link
+                  to={isLoggedIn ? "/post-task" : "/signup"}
+                  className="service-explore-link"
+                >
+                  Explore
+                </Link>
+              </div>
+            ))}
+          </div>
+        </section>
+
+        {/* HOW IT WORKS */}
+        <section className="how-section" id="how-it-works">
+          <div className="section-heading">
+            <p>How it works</p>
+
+            <h2>Getting things done is simple</h2>
+          </div>
+
+          <div className="steps-grid">
+            <div className="step-card">
+              <span>01</span>
+
+              <h3>Post your task</h3>
+
+              <p>
+                Tell us what you need done, where you need it, and when you need
+                it.
+              </p>
+            </div>
+
+            <div className="step-card">
+              <span>02</span>
+
+              <h3>Choose a provider</h3>
+
+              <p>
+                Review available service providers, prices, ratings, and
+                experience.
+              </p>
+            </div>
+
+            <div className="step-card">
+              <span>03</span>
+
+              <h3>Get it done</h3>
+
+              <p>
+                Hire the provider that works for you and get your task
+                completed.
+              </p>
+            </div>
+          </div>
+        </section>
+
+        {/* PROVIDER SECTION */}
+        <section className="provider-section">
+          <div className="provider-content">
+            <div>
+              <p className="provider-label">Earn with Pata Kazi</p>
+
+              <h2>Turn your skills into income.</h2>
+
+              <p className="provider-description">
+                Create your profile, choose the services you offer, and connect
+                with customers looking for your skills.
+              </p>
+            </div>
+
+            <Link
+              to={isLoggedIn ? "/account" : "/signup"}
+              className="provider-button"
+            >
+              Become a provider
+            </Link>
+          </div>
+        </section>
+      </main>
+
+      {/* FOOTER */}
+      <footer className="footer">
+        <div className="footer-container">
+          <div>
+            <h3>Pata Kazi</h3>
+
+            <p>Find work. Find help. Get things done.</p>
+          </div>
+
+          <p>© 2026 Pata Kazi. All rights reserved.</p>
+        </div>
+      </footer>
+    </div>
   );
 }
 
-export default App;
+export default Home;
