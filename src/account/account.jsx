@@ -5,12 +5,14 @@ import "./account.css";
 function Account() {
   const navigate = useNavigate();
 
+  const savedUser = JSON.parse(localStorage.getItem("pataKaziUser"));
+
   const [user, setUser] = useState({
-    fullName: "John Doe",
-    email: "john@example.com",
-    phone: "0712 345 678",
-    location: "Nairobi, Kenya",
-    role: "Customer",
+    fullName: savedUser?.fullName || "Pata Kazi User",
+    email: savedUser?.email || "",
+    phone: savedUser?.phone || "",
+    role: savedUser?.role || "customer",
+    location: savedUser?.location || "Nairobi, Kenya",
   });
 
   const [isEditing, setIsEditing] = useState(false);
@@ -25,14 +27,19 @@ function Account() {
   const handleSave = (e) => {
     e.preventDefault();
 
-    console.log("Updated user:", user);
+    localStorage.setItem("pataKaziUser", JSON.stringify(user));
 
     setIsEditing(false);
   };
 
   const handleLogout = () => {
+    localStorage.removeItem("pataKaziToken");
+    localStorage.removeItem("pataKaziUser");
+
     navigate("/");
   };
+
+  const roleLabel = user.role === "provider" ? "Service Provider" : "Customer";
 
   return (
     <div className="account-page">
@@ -44,6 +51,7 @@ function Account() {
 
           <div className="account-nav-links">
             <Link to="/home">Home</Link>
+
             <Link to="/account" className="active-nav-link">
               My Account
             </Link>
@@ -60,43 +68,65 @@ function Account() {
       </nav>
 
       <main className="account-main">
-        <div className="account-header">
-          <div>
-            <p className="account-label">Account</p>
-
-            <h1>My Profile</h1>
-
-            <p>
-              Manage your personal information and account settings.
-            </p>
+        <section className="profile-hero">
+          <div className="profile-avatar-large">
+            {user.fullName ? user.fullName.charAt(0).toUpperCase() : "U"}
           </div>
-        </div>
 
-        <div className="account-grid">
-          <aside className="profile-summary">
-            <div className="profile-avatar">
-              {user.fullName.charAt(0)}
+          <div className="profile-hero-info">
+            <p className="profile-small-label">My Account</p>
+
+            <h1>{user.fullName}</h1>
+
+            <div className="profile-meta">
+              <span>{roleLabel}</span>
+
+              <span>{user.location}</span>
             </div>
+          </div>
 
-            <h2>{user.fullName}</h2>
+          <button
+            type="button"
+            className="edit-profile-main"
+            onClick={() => setIsEditing(true)}
+          >
+            Edit profile
+          </button>
+        </section>
 
-            <p>{user.email}</p>
+        <section className="account-stats">
+          <div className="stat-card">
+            <span>0</span>
+            <p>Tasks posted</p>
+          </div>
 
-            <span className="account-role">
-              {user.role}
-            </span>
+          <div className="stat-card">
+            <span>0</span>
+            <p>Tasks completed</p>
+          </div>
 
-            <div className="summary-divider"></div>
+          <div className="stat-card">
+            <span>0</span>
+            <p>Reviews</p>
+          </div>
 
-            <div className="profile-stat">
-              <span>Location</span>
-              <strong>{user.location}</strong>
-            </div>
+          <div className="stat-card">
+            <span>New</span>
+            <p>Account status</p>
+          </div>
+        </section>
 
-            <div className="profile-stat">
-              <span>Phone</span>
-              <strong>{user.phone}</strong>
-            </div>
+        <div className="account-layout">
+          <aside className="account-sidebar">
+            <button className="sidebar-item active-sidebar">Profile</button>
+
+            <button className="sidebar-item">My Tasks</button>
+
+            <button className="sidebar-item">Saved Services</button>
+
+            <button className="sidebar-item">Reviews</button>
+
+            <button className="sidebar-item">Security</button>
           </aside>
 
           <section className="account-content">
@@ -104,31 +134,17 @@ function Account() {
               <div className="card-header">
                 <div>
                   <h2>Personal information</h2>
-                  <p>
-                    Update your account details.
-                  </p>
-                </div>
 
-                {!isEditing && (
-                  <button
-                    type="button"
-                    className="edit-button"
-                    onClick={() => setIsEditing(true)}
-                  >
-                    Edit profile
-                  </button>
-                )}
+                  <p>Manage your personal details and account information.</p>
+                </div>
               </div>
 
               <form onSubmit={handleSave}>
                 <div className="account-form-grid">
                   <div className="account-form-group">
-                    <label htmlFor="fullName">
-                      Full name
-                    </label>
+                    <label>Full name</label>
 
                     <input
-                      id="fullName"
                       type="text"
                       name="fullName"
                       value={user.fullName}
@@ -138,12 +154,9 @@ function Account() {
                   </div>
 
                   <div className="account-form-group">
-                    <label htmlFor="email">
-                      Email address
-                    </label>
+                    <label>Email address</label>
 
                     <input
-                      id="email"
                       type="email"
                       name="email"
                       value={user.email}
@@ -153,12 +166,9 @@ function Account() {
                   </div>
 
                   <div className="account-form-group">
-                    <label htmlFor="phone">
-                      Phone number
-                    </label>
+                    <label>Phone number</label>
 
                     <input
-                      id="phone"
                       type="tel"
                       name="phone"
                       value={user.phone}
@@ -168,12 +178,9 @@ function Account() {
                   </div>
 
                   <div className="account-form-group">
-                    <label htmlFor="location">
-                      Location
-                    </label>
+                    <label>Location</label>
 
                     <input
-                      id="location"
                       type="text"
                       name="location"
                       value={user.location}
@@ -183,24 +190,17 @@ function Account() {
                   </div>
 
                   <div className="account-form-group full-width">
-                    <label htmlFor="role">
-                      Account type
-                    </label>
+                    <label>Account type</label>
 
                     <select
-                      id="role"
                       name="role"
                       value={user.role}
                       onChange={handleChange}
                       disabled={!isEditing}
                     >
-                      <option value="Customer">
-                        Customer
-                      </option>
+                      <option value="customer">Customer</option>
 
-                      <option value="Service Provider">
-                        Service Provider
-                      </option>
+                      <option value="provider">Service Provider</option>
                     </select>
                   </div>
                 </div>
@@ -215,10 +215,7 @@ function Account() {
                       Cancel
                     </button>
 
-                    <button
-                      type="submit"
-                      className="save-button"
-                    >
+                    <button type="submit" className="save-button">
                       Save changes
                     </button>
                   </div>
@@ -229,59 +226,39 @@ function Account() {
             <div className="account-card">
               <div className="card-header">
                 <div>
-                  <h2>Password & Security</h2>
+                  <h2>Account activity</h2>
 
-                  <p>
-                    Manage your password and account security.
-                  </p>
+                  <p>Your recent activity on Pata Kazi will appear here.</p>
                 </div>
               </div>
 
-              <div className="security-row">
-                <div>
-                  <h3>Password</h3>
+              <div className="empty-state">
+                <h3>No activity yet</h3>
 
-                  <p>
-                    Update your password regularly to keep your
-                    account secure.
-                  </p>
-                </div>
+                <p>
+                  Start using Pata Kazi and your tasks, jobs, and activity will
+                  appear here.
+                </p>
 
-                <button
-                  type="button"
-                  className="secondary-account-button"
-                >
-                  Change password
-                </button>
+                <Link to="/home" className="browse-button">
+                  Browse services
+                </Link>
               </div>
             </div>
 
-            <div className="account-card danger-card">
-              <div className="card-header">
-                <div>
-                  <h2>Account actions</h2>
-
-                  <p>
-                    Manage your account session.
-                  </p>
-                </div>
-              </div>
-
+            <div className="account-card">
               <div className="security-row">
                 <div>
-                  <h3>Log out</h3>
+                  <h3>Password & Security</h3>
 
                   <p>
-                    Sign out of your Pata Kazi account.
+                    Keep your account secure by regularly updating your
+                    password.
                   </p>
                 </div>
 
-                <button
-                  type="button"
-                  className="logout-button"
-                  onClick={handleLogout}
-                >
-                  Log out
+                <button type="button" className="secondary-account-button">
+                  Change password
                 </button>
               </div>
             </div>
