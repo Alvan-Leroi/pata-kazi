@@ -94,7 +94,7 @@ function Home() {
 
             <div className="hero-actions">
               <Link
-                to={isLoggedIn ? "/account" : "/signup"}
+                to={isLoggedIn ? "/post-task" : "/signup"}
                 className="primary-button"
               >
                 Find someone
@@ -139,7 +139,12 @@ function Home() {
 
                 <p>Find trusted providers near you.</p>
 
-                <button type="button">Explore</button>
+                <Link
+                  to={isLoggedIn ? "/post-task" : "/signup"}
+                  className="service-explore-link"
+                >
+                  Explore
+                </Link>
               </div>
             ))}
           </div>
