@@ -30,12 +30,6 @@ function Home() {
     "Yard Work",
   ];
 
-  /*
-  ========================================
-  REDIRECT PROVIDERS
-  ========================================
-  */
-
   useEffect(() => {
     if (isLoggedIn && savedUser?.role === "provider") {
       navigate("/provider", {
@@ -43,12 +37,6 @@ function Home() {
       });
     }
   }, [isLoggedIn, navigate, savedUser?.role]);
-
-  /*
-  ========================================
-  LOAD CUSTOMER TASKS
-  ========================================
-  */
 
   useEffect(() => {
     const loadMyTasks = async () => {
@@ -58,7 +46,6 @@ function Home() {
 
       try {
         setTasksLoading(true);
-
         setTasksMessage("");
 
         const response = await fetch(`${API_URL}/api/tasks/mine`, {
@@ -88,7 +75,7 @@ function Home() {
     };
 
     loadMyTasks();
-  }, [API_URL, isLoggedIn, token, savedUser?.role]);
+  }, [API_URL, isLoggedIn, savedUser?.role, token]);
 
   const handleLogout = () => {
     localStorage.removeItem("pataKaziToken");
@@ -107,13 +94,12 @@ function Home() {
       return "";
     }
 
-    return new Date(dateValue).toLocaleDateString();
+    return new Date(dateValue).toLocaleDateString("en-KE", {
+      year: "numeric",
+      month: "short",
+      day: "numeric",
+    });
   };
-
-  /*
-  Provider should not render
-  customer page while redirecting
-  */
 
   if (isLoggedIn && savedUser?.role === "provider") {
     return null;
@@ -121,8 +107,6 @@ function Home() {
 
   return (
     <div className="home-page">
-      {/* NAVBAR */}
-
       <nav className="navbar">
         <div className="navbar-container">
           <Link to="/home" className="logo">
@@ -182,8 +166,6 @@ function Home() {
       </nav>
 
       <main>
-        {/* HERO */}
-
         <section className="hero-section">
           <div className="hero-content">
             <span className="hero-badge">Local services made simple</span>
@@ -210,18 +192,8 @@ function Home() {
                 Find work
               </Link>
             </div>
-
-            <div className="search-box">
-              <input type="text" placeholder="What service do you need?" />
-
-              <input type="text" placeholder="Enter your location" />
-
-              <button type="button">Search</button>
-            </div>
           </div>
         </section>
-
-        {/* CUSTOMER TASKS */}
 
         {isLoggedIn && (
           <section className="my-tasks-section" id="my-tasks">
@@ -233,8 +205,7 @@ function Home() {
                   <h2>My Posted Tasks</h2>
 
                   <p>
-                    View the jobs you have posted and check for available
-                    providers.
+                    View your posted jobs, provider offers, and active work.
                   </p>
                 </div>
 
@@ -269,51 +240,92 @@ function Home() {
 
               {!tasksLoading && !tasksMessage && myTasks.length > 0 && (
                 <div className="my-tasks-grid">
-                  {myTasks.map((task) => (
-                    <article className="home-task-card" key={task._id}>
-                      <div className="home-task-card-top">
-                        <span
-                          className={`task-status task-status-${task.status}`}
-                        >
-                          {task.status || "open"}
-                        </span>
+                  {myTasks.map((task) => {
+                    const canChat = ["assigned", "in-progress"].includes(
+                      task.status,
+                    );
 
-                        <span className="task-date">
-                          {formatDate(task.createdAt)}
-                        </span>
-                      </div>
+                    return (
+                      <article className="home-task-card" key={task._id}>
+                        <div className="home-task-card-top">
+                          <span
+                            className={`task-status task-status-${task.status}`}
+                          >
+                            {task.status || "open"}
+                          </span>
 
-                      <h3>{task.title}</h3>
+                          <span className="task-date">
+                            {formatDate(task.createdAt)}
+                          </span>
+                        </div>
 
-                      <p className="home-task-description">
-                        {task.description}
-                      </p>
+                        <h3>{task.title}</h3>
 
-                      <div className="home-task-meta">
-                        <span>{task.category}</span>
+                        <p className="home-task-description">
+                          {task.description}
+                        </p>
 
-                        <span>{task.location}</span>
+                        <div className="home-task-meta">
+                          <span>{task.category}</span>
 
-                        <span>KES {formatBudget(task.budget)}</span>
-                      </div>
+                          <span>{task.location}</span>
 
-                      <div className="home-task-actions">
-                        <Link
-                          to={`/task/${task._id}/providers`}
-                          className="view-providers-button"
-                        >
-                          View available providers
-                        </Link>
-                      </div>
-                    </article>
-                  ))}
+                          <span>KES {formatBudget(task.budget)}</span>
+                        </div>
+
+                        {task.assignedProviderId?.fullName && canChat && (
+                          <div className="home-assigned-provider">
+                            <span>Assigned provider</span>
+
+                            <strong>{task.assignedProviderId.fullName}</strong>
+                          </div>
+                        )}
+
+                        <div className="home-task-actions">
+                          {task.status === "open" && (
+                            <>
+                              <Link
+                                to={`/task/${task._id}/offers`}
+                                className="view-offers-button"
+                              >
+                                View Offers
+                              </Link>
+
+                              <Link
+                                to={`/task/${task._id}/providers`}
+                                className="view-providers-button"
+                              >
+                                Find Providers
+                              </Link>
+                            </>
+                          )}
+
+                          {canChat && (
+                            <>
+                              <Link
+                                to={`/task/${task._id}/chat`}
+                                className="message-provider-button"
+                              >
+                                Message Provider
+                              </Link>
+
+                              <Link
+                                to={`/task/${task._id}/offers`}
+                                className="view-offers-button"
+                              >
+                                View Job Details
+                              </Link>
+                            </>
+                          )}
+                        </div>
+                      </article>
+                    );
+                  })}
                 </div>
               )}
             </div>
           </section>
         )}
-
-        {/* SERVICES */}
 
         <section className="services-section" id="services">
           <div className="section-heading">
@@ -346,8 +358,6 @@ function Home() {
           </div>
         </section>
 
-        {/* HOW IT WORKS */}
-
         <section className="how-section" id="how-it-works">
           <div className="section-heading">
             <p>How it works</p>
@@ -367,17 +377,17 @@ function Home() {
             <div className="step-card">
               <span>02</span>
 
-              <h3>Choose a provider</h3>
+              <h3>Receive offers</h3>
 
-              <p>Review available service providers.</p>
+              <p>Providers can send you their price and a short message.</p>
             </div>
 
             <div className="step-card">
               <span>03</span>
 
-              <h3>Get it done</h3>
+              <h3>Choose a provider</h3>
 
-              <p>Choose the provider who works for you.</p>
+              <p>Compare offers and choose the provider that works for you.</p>
             </div>
           </div>
         </section>

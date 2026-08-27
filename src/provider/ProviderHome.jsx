@@ -15,6 +15,8 @@ function ProviderHome() {
 
   const [jobs, setJobs] = useState([]);
 
+  const [myJobs, setMyJobs] = useState([]);
+
   const [jobsLoading, setJobsLoading] = useState(false);
 
   const [message, setMessage] = useState("");
@@ -25,20 +27,12 @@ function ProviderHome() {
 
   const [categoryFilter, setCategoryFilter] = useState("");
 
-  const isLoggedIn = !!token;
-
   const providerServices = savedUser?.services || [];
 
   const providerFirstName = savedUser?.fullName?.split(" ")[0] || "Provider";
 
-  /*
-  ========================================
-  PROTECT PROVIDER PAGE
-  ========================================
-  */
-
   useEffect(() => {
-    if (!isLoggedIn) {
+    if (!token) {
       navigate("/");
       return;
     }
@@ -48,12 +42,18 @@ function ProviderHome() {
       return;
     }
 
-    const loadJobs = async () => {
+    const loadProviderData = async () => {
       try {
         setJobsLoading(true);
         setMessage("");
 
-        const response = await fetch(`${API_URL}/api/tasks/open`, {
+        /*
+          ========================================
+          LOAD OPEN JOBS
+          ========================================
+          */
+
+        const openResponse = await fetch(`${API_URL}/api/tasks/open`, {
           method: "GET",
 
           headers: {
@@ -61,17 +61,44 @@ function ProviderHome() {
           },
         });
 
-        const data = await response.json();
+        const openData = await openResponse.json();
 
-        if (!response.ok) {
-          setMessage(data.message || "Unable to load available jobs.");
+        if (!openResponse.ok) {
+          setMessage(openData.message || "Unable to load available jobs.");
 
           return;
         }
 
-        setJobs(Array.isArray(data) ? data : []);
+        setJobs(Array.isArray(openData) ? openData : []);
+
+        /*
+          ========================================
+          LOAD ASSIGNED JOBS
+          ========================================
+          */
+
+        const myJobsResponse = await fetch(
+          `${API_URL}/api/tasks/provider/my-jobs`,
+          {
+            method: "GET",
+
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          },
+        );
+
+        const myJobsData = await myJobsResponse.json();
+
+        if (!myJobsResponse.ok) {
+          console.error("Unable to load assigned jobs:", myJobsData);
+
+          setMyJobs([]);
+        } else {
+          setMyJobs(Array.isArray(myJobsData) ? myJobsData : []);
+        }
       } catch (error) {
-        console.error("Load provider jobs error:", error);
+        console.error("Provider dashboard error:", error);
 
         setMessage("Unable to connect to the server.");
       } finally {
@@ -79,48 +106,29 @@ function ProviderHome() {
       }
     };
 
-    loadJobs();
-  }, [API_URL, isLoggedIn, navigate, savedUser?.role, token]);
-
-  /*
-  ========================================
-  FILTER JOBS
-  ========================================
-  */
+    loadProviderData();
+  }, [API_URL, navigate, savedUser?.role, token]);
 
   const filteredJobs = useMemo(() => {
     return jobs.filter((job) => {
-      const searchMatches =
+      const searchMatch =
         !searchTerm ||
         job.title?.toLowerCase().includes(searchTerm.toLowerCase()) ||
         job.description?.toLowerCase().includes(searchTerm.toLowerCase());
 
-      const locationMatches =
+      const locationMatch =
         !locationFilter ||
         job.location?.toLowerCase().includes(locationFilter.toLowerCase());
 
-      const categoryMatches =
-        !categoryFilter || job.category === categoryFilter;
+      const categoryMatch = !categoryFilter || job.category === categoryFilter;
 
-      return searchMatches && locationMatches && categoryMatches;
+      return searchMatch && locationMatch && categoryMatch;
     });
   }, [jobs, searchTerm, locationFilter, categoryFilter]);
 
-  /*
-  ========================================
-  MATCHED JOB COUNT
-  ========================================
-  */
-
-  const matchedJobs = jobs.filter((job) =>
+  const matchingJobs = jobs.filter((job) =>
     providerServices.includes(job.category),
   );
-
-  /*
-  ========================================
-  LOGOUT
-  ========================================
-  */
 
   const handleLogout = () => {
     localStorage.removeItem("pataKaziToken");
@@ -130,14 +138,8 @@ function ProviderHome() {
     navigate("/");
   };
 
-  /*
-  ========================================
-  FORMATTERS
-  ========================================
-  */
-
-  const formatBudget = (budget) => {
-    return Number(budget || 0).toLocaleString();
+  const formatBudget = (amount) => {
+    return Number(amount || 0).toLocaleString();
   };
 
   const formatDate = (dateValue) => {
@@ -163,9 +165,7 @@ function ProviderHome() {
 
   return (
     <div className="provider-home-page">
-      {/* =================================
-          NAVBAR
-      ================================= */}
+      {/* NAVBAR */}
 
       <nav className="provider-navbar">
         <div className="provider-navbar-container">
@@ -174,13 +174,13 @@ function ProviderHome() {
           </Link>
 
           <div className="provider-nav-links">
-            <a href="#jobs">Find Jobs</a>
+            <a href="#my-jobs">My Jobs</a>
+
+            <a href="#available-jobs">Find Jobs</a>
 
             <a href="#services">My Services</a>
 
-            <Link to="/provider-account">My Work</Link>
-
-            <Link to="/provider-account">Reviews</Link>
+            <Link to="/provider-account">Provider Profile</Link>
           </div>
 
           <div className="provider-user-area">
@@ -210,9 +210,7 @@ function ProviderHome() {
       </nav>
 
       <main>
-        {/* =================================
-            HERO
-        ================================= */}
+        {/* HERO */}
 
         <section className="provider-dashboard-hero">
           <div className="provider-dashboard-container">
@@ -224,21 +222,18 @@ function ProviderHome() {
               <h1>Welcome back, {providerFirstName}.</h1>
 
               <p>
-                Find jobs that match your skills, manage your services, and grow
-                your reputation on Pata Kazi.
+                Manage active work, communicate with customers, and find new
+                jobs near you.
               </p>
 
               <div className="provider-dashboard-actions">
-                <a href="#jobs" className="provider-main-action">
-                  Find available jobs
+                <a href="#available-jobs" className="provider-main-action">
+                  Find new jobs
                 </a>
 
-                <Link
-                  to="/provider-account"
-                  className="provider-outline-action"
-                >
-                  Manage profile
-                </Link>
+                <a href="#my-jobs" className="provider-outline-action">
+                  View my jobs
+                </a>
               </div>
             </div>
 
@@ -248,7 +243,7 @@ function ProviderHome() {
               </div>
 
               <div className="provider-summary-text">
-                <p>Your provider profile</p>
+                <p>Provider profile</p>
 
                 <h3>{savedUser?.fullName || "Provider"}</h3>
 
@@ -259,41 +254,39 @@ function ProviderHome() {
                 to="/provider-account"
                 className="provider-profile-edit-link"
               >
-                Edit profile
+                Manage
               </Link>
             </div>
           </div>
         </section>
 
-        {/* =================================
-            DASHBOARD STATS
-        ================================= */}
+        {/* STATS */}
 
         <section className="provider-stats-section">
           <div className="provider-content-container">
             <div className="provider-stats-grid">
               <div className="provider-stat-card">
-                <p>Open Jobs</p>
+                <p>Active Jobs</p>
+
+                <strong>{myJobs.length}</strong>
+
+                <span>Jobs you were hired for</span>
+              </div>
+
+              <div className="provider-stat-card">
+                <p>Available Jobs</p>
 
                 <strong>{jobs.length}</strong>
 
-                <span>Available right now</span>
+                <span>Open customer jobs</span>
               </div>
 
               <div className="provider-stat-card">
                 <p>Matching Jobs</p>
 
-                <strong>{matchedJobs.length}</strong>
+                <strong>{matchingJobs.length}</strong>
 
                 <span>Match your services</span>
-              </div>
-
-              <div className="provider-stat-card">
-                <p>Services</p>
-
-                <strong>{providerServices.length}</strong>
-
-                <span>Listed on your profile</span>
               </div>
 
               <div className="provider-stat-card">
@@ -309,9 +302,111 @@ function ProviderHome() {
           </div>
         </section>
 
-        {/* =================================
-            SERVICES
-        ================================= */}
+        {/* MY ACTIVE JOBS */}
+
+        <section className="provider-jobs-section" id="my-jobs">
+          <div className="provider-content-container">
+            <div className="provider-section-header">
+              <div>
+                <p className="provider-section-label">Your work</p>
+
+                <h2>My Active Jobs</h2>
+
+                <p>Jobs where the customer selected you as their provider.</p>
+              </div>
+            </div>
+
+            {jobsLoading ? (
+              <div className="provider-state-card">Loading your jobs...</div>
+            ) : myJobs.length === 0 ? (
+              <div className="provider-empty-jobs">
+                <div className="provider-empty-circle">0</div>
+
+                <h3>No active jobs yet</h3>
+
+                <p>
+                  When a customer accepts one of your offers, the job will
+                  appear here.
+                </p>
+              </div>
+            ) : (
+              <div className="provider-jobs-grid">
+                {myJobs.map((job) => (
+                  <article className="provider-job-card" key={job._id}>
+                    <div className="provider-job-card-top">
+                      <div className="provider-job-badges">
+                        <span className="provider-assigned-badge">
+                          {job.status}
+                        </span>
+                      </div>
+
+                      <span className="provider-job-date">
+                        {formatDate(job.updatedAt)}
+                      </span>
+                    </div>
+
+                    <h3>{job.title}</h3>
+
+                    <p className="provider-job-description">
+                      {job.description}
+                    </p>
+
+                    <div className="provider-job-meta">
+                      <div>
+                        <span>Service</span>
+
+                        <strong>{job.category}</strong>
+                      </div>
+
+                      <div>
+                        <span>Location</span>
+
+                        <strong>{job.location}</strong>
+                      </div>
+
+                      <div>
+                        <span>Agreed price</span>
+
+                        <strong>
+                          KES{" "}
+                          {formatBudget(
+                            job.acceptedOffer?.amount || job.budget,
+                          )}
+                        </strong>
+                      </div>
+                    </div>
+
+                    {job.customerId?.fullName && (
+                      <div className="provider-job-customer">
+                        <span>Customer</span>
+
+                        <strong>{job.customerId.fullName}</strong>
+                      </div>
+                    )}
+
+                    <div className="provider-job-actions">
+                      <Link
+                        to={`/provider/job/${job._id}`}
+                        className="provider-view-job-button"
+                      >
+                        View Active Job
+                      </Link>
+
+                      <Link
+                        to={`/task/${job._id}/chat`}
+                        className="provider-message-customer-button"
+                      >
+                        Message Customer
+                      </Link>
+                    </div>
+                  </article>
+                ))}
+              </div>
+            )}
+          </div>
+        </section>
+
+        {/* SERVICES */}
 
         <section className="provider-services-section" id="services">
           <div className="provider-content-container">
@@ -322,8 +417,7 @@ function ProviderHome() {
                 <h2>Services you offer</h2>
 
                 <p>
-                  These services help Pata Kazi match you with relevant customer
-                  jobs.
+                  These services help Pata Kazi match you with relevant work.
                 </p>
               </div>
 
@@ -340,19 +434,19 @@ function ProviderHome() {
                   <h3>Add your services</h3>
 
                   <p>
-                    Your account does not have any services listed yet. Add the
-                    types of work you can do so customers can find you.
+                    Add the type of work you can perform to improve job
+                    matching.
                   </p>
 
                   <Link to="/provider-account" className="provider-main-action">
-                    Complete provider profile
+                    Complete profile
                   </Link>
                 </div>
               </div>
             ) : (
               <div className="provider-service-list">
                 {providerServices.map((service) => (
-                  <div className="provider-service-card" key={service}>
+                  <article className="provider-service-card" key={service}>
                     <div className="provider-service-letter">
                       {service.charAt(0)}
                     </div>
@@ -362,18 +456,19 @@ function ProviderHome() {
 
                       <p>You can receive jobs in this category.</p>
                     </div>
-                  </div>
+                  </article>
                 ))}
               </div>
             )}
           </div>
         </section>
 
-        {/* =================================
-            JOBS
-        ================================= */}
+        {/* AVAILABLE JOBS */}
 
-        <section className="provider-jobs-section" id="jobs">
+        <section
+          className="provider-jobs-section provider-available-section"
+          id="available-jobs"
+        >
           <div className="provider-content-container">
             <div className="provider-section-header">
               <div>
@@ -381,14 +476,9 @@ function ProviderHome() {
 
                 <h2>Available Jobs</h2>
 
-                <p>
-                  Browse jobs posted by customers and find work that fits your
-                  skills.
-                </p>
+                <p>Browse open jobs posted by customers.</p>
               </div>
             </div>
-
-            {/* FILTERS */}
 
             <div className="provider-job-filters">
               <input
@@ -419,27 +509,17 @@ function ProviderHome() {
               </select>
             </div>
 
-            {jobsLoading && (
-              <div className="provider-state-card">
-                Loading available jobs...
-              </div>
-            )}
+            {message && <div className="provider-state-card">{message}</div>}
 
-            {!jobsLoading && message && (
-              <div className="provider-state-card">{message}</div>
-            )}
-
-            {!jobsLoading && !message && filteredJobs.length === 0 && (
+            {!message && filteredJobs.length === 0 ? (
               <div className="provider-empty-jobs">
                 <div className="provider-empty-circle">0</div>
 
-                <h3>No jobs found</h3>
+                <h3>No available jobs</h3>
 
-                <p>There are currently no open jobs matching your search.</p>
+                <p>New customer jobs will appear here.</p>
               </div>
-            )}
-
-            {!jobsLoading && !message && filteredJobs.length > 0 && (
+            ) : (
               <div className="provider-jobs-grid">
                 {filteredJobs.map((job) => {
                   const isMatch = providerServices.includes(job.category);
@@ -447,7 +527,7 @@ function ProviderHome() {
                   return (
                     <article className="provider-job-card" key={job._id}>
                       <div className="provider-job-card-top">
-                        <div>
+                        <div className="provider-job-badges">
                           <span className="provider-job-status">Open</span>
 
                           {isMatch && (
@@ -488,28 +568,13 @@ function ProviderHome() {
                         </div>
                       </div>
 
-                      {job.customerId?.fullName && (
-                        <div className="provider-job-customer">
-                          <span>Posted by</span>
-
-                          <strong>{job.customerId.fullName}</strong>
-                        </div>
-                      )}
-
-                      <div className="provider-job-actions">
+                      <div className="provider-job-actions provider-single-job-action">
                         <Link
                           to={`/provider/job/${job._id}`}
                           className="provider-view-job-button"
                         >
-                          View job
+                          View Job
                         </Link>
-
-                        <button
-                          type="button"
-                          className="provider-save-job-button"
-                        >
-                          Save
-                        </button>
                       </div>
                     </article>
                   );
@@ -518,72 +583,7 @@ function ProviderHome() {
             )}
           </div>
         </section>
-
-        {/* =================================
-            PROVIDER TOOLS
-        ================================= */}
-
-        <section className="provider-tools-section">
-          <div className="provider-content-container">
-            <div className="provider-section-header">
-              <div>
-                <p className="provider-section-label">Provider tools</p>
-
-                <h2>Manage your work</h2>
-              </div>
-            </div>
-
-            <div className="provider-tools-grid">
-              <Link to="/provider-account" className="provider-tool-card">
-                <span>Profile</span>
-
-                <h3>Provider Profile</h3>
-
-                <p>
-                  Update your contact details, services, location, and provider
-                  information.
-                </p>
-              </Link>
-
-              <Link to="/provider-account" className="provider-tool-card">
-                <span>Work</span>
-
-                <h3>My Jobs</h3>
-
-                <p>
-                  Keep track of jobs you are interested in, active work, and
-                  completed work.
-                </p>
-              </Link>
-
-              <Link to="/provider-account" className="provider-tool-card">
-                <span>Reputation</span>
-
-                <h3>Reviews</h3>
-
-                <p>
-                  See customer feedback and build trust with future customers.
-                </p>
-              </Link>
-
-              <Link to="/provider-account" className="provider-tool-card">
-                <span>Earnings</span>
-
-                <h3>Earnings</h3>
-
-                <p>
-                  Track your completed work and earnings once payments are
-                  added.
-                </p>
-              </Link>
-            </div>
-          </div>
-        </section>
       </main>
-
-      {/* =================================
-          FOOTER
-      ================================= */}
 
       <footer className="provider-footer">
         <div className="provider-footer-container">

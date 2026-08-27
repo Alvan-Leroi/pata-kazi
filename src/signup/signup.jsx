@@ -9,66 +9,65 @@ function Signup() {
 
   const API_URL = import.meta.env.VITE_API_URL;
 
-  const [formData, setFormData] = useState({
-    fullName: "",
-    email: "",
-    phone: "",
-    password: "",
-    confirmPassword: "",
-    role: "customer",
-  });
+  const [role, setRole] = useState("customer");
+
+  const [fullName, setFullName] = useState("");
+
+  const [email, setEmail] = useState("");
+
+  const [phone, setPhone] = useState("");
+
+  const [password, setPassword] = useState("");
+
+  const [confirmPassword, setConfirmPassword] = useState("");
 
   const [showPassword, setShowPassword] = useState(false);
 
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
-  const [termsAccepted, setTermsAccepted] = useState(false);
+  const [agreed, setAgreed] = useState(false);
 
   const [message, setMessage] = useState("");
 
-  const [isLoading, setIsLoading] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const handleChange = (e) => {
-    const { name, value } = e.target;
-
-    setFormData({
-      ...formData,
-      [name]: value,
-    });
-  };
-
-  const selectRole = (role) => {
-    setFormData({
-      ...formData,
-      role,
-    });
-  };
-
-  const handleSubmit = async (e) => {
-    e.preventDefault();
+  const handleSubmit = async (event) => {
+    event.preventDefault();
 
     setMessage("");
 
-    if (formData.password !== formData.confirmPassword) {
+    if (
+      !fullName.trim() ||
+      !email.trim() ||
+      !phone.trim() ||
+      !password ||
+      !confirmPassword
+    ) {
+      setMessage("Please complete all fields.");
+
+      return;
+    }
+
+    if (password !== confirmPassword) {
       setMessage("Passwords do not match.");
 
       return;
     }
 
-    if (!termsAccepted) {
-      setMessage("Please accept the Terms & Conditions.");
+    if (password.length < 6) {
+      setMessage("Password must be at least 6 characters.");
 
       return;
     }
 
-    if (!API_URL) {
-      setMessage("The server address is not configured.");
+    if (!agreed) {
+      setMessage("Please agree to the Terms & Conditions.");
 
       return;
     }
 
     try {
-      setIsLoading(true);
+      setIsSubmitting(true);
 
       const response = await fetch(`${API_URL}/api/auth/register`, {
         method: "POST",
@@ -78,15 +77,15 @@ function Signup() {
         },
 
         body: JSON.stringify({
-          fullName: formData.fullName,
+          fullName: fullName.trim(),
 
-          email: formData.email,
+          email: email.trim(),
 
-          phone: formData.phone,
+          phone: phone.trim(),
 
-          password: formData.password,
+          password,
 
-          role: formData.role,
+          role,
         }),
       });
 
@@ -98,33 +97,13 @@ function Signup() {
         return;
       }
 
-      /*
-        ====================================
-        SAVE LOGIN TOKEN
-        ====================================
-        */
-
       if (data.token) {
         localStorage.setItem("pataKaziToken", data.token);
       }
 
-      /*
-        ====================================
-        SAVE USER INFORMATION
-        ====================================
-        */
-
       if (data.user) {
         localStorage.setItem("pataKaziUser", JSON.stringify(data.user));
       }
-
-      setMessage("Account created successfully!");
-
-      /*
-        ====================================
-        REDIRECT BASED ON ROLE
-        ====================================
-        */
 
       if (data.user?.role === "provider") {
         navigate("/provider");
@@ -134,227 +113,183 @@ function Signup() {
     } catch (error) {
       console.error("Signup error:", error);
 
-      setMessage("Unable to connect to the server. Please try again.");
+      setMessage("Unable to connect to the server.");
     } finally {
-      setIsLoading(false);
+      setIsSubmitting(false);
     }
   };
 
   return (
     <div className="signup-page">
-      <div className="signup-container">
-        {/* BRAND */}
+      <div className="signup-background-glow signup-glow-one"></div>
 
+      <div className="signup-background-glow signup-glow-two"></div>
+
+      <main className="signup-card">
         <div className="signup-brand">
-          <Link to="/" className="signup-logo">
-            Pata Kazi
-          </Link>
-
-          <p>Find help. Find work. Get things done.</p>
+          <Link to="/">Pata Kazi</Link>
         </div>
 
-        {/* SIGNUP CARD */}
+        <div className="signup-heading">
+          <p className="signup-eyebrow">Join the community</p>
 
-        <div className="signup-card">
-          <div className="signup-header">
-            <h1>Create your account</h1>
+          <h1>Create your account</h1>
 
-            <p>Join Pata Kazi and connect with people in your community.</p>
-          </div>
+          <p>Join Pata Kazi and connect with people in your community.</p>
+        </div>
 
-          {/* ROLE SELECTION */}
+        <form onSubmit={handleSubmit} className="signup-form">
+          <div className="signup-role-section">
+            <label className="signup-main-label">
+              What would you like to do?
+            </label>
 
-          <div className="role-section">
-            <p className="role-title">What would you like to do?</p>
-
-            <div className="role-options">
-              {/* CUSTOMER */}
-
+            <div className="signup-role-grid">
               <button
                 type="button"
-                className={
-                  formData.role === "customer"
-                    ? "role-card active"
-                    : "role-card"
-                }
-                onClick={() => selectRole("customer")}
+                className={`signup-role-card ${
+                  role === "customer" ? "signup-role-card-active" : ""
+                }`}
+                onClick={() => setRole("customer")}
               >
-                <span className="role-card-title">Hire someone</span>
+                <span className="signup-role-title">Hire someone</span>
 
-                <span className="role-card-description">
+                <span className="signup-role-description">
                   I need help getting something done.
                 </span>
               </button>
 
-              {/* PROVIDER */}
-
               <button
                 type="button"
-                className={
-                  formData.role === "provider"
-                    ? "role-card active"
-                    : "role-card"
-                }
-                onClick={() => selectRole("provider")}
+                className={`signup-role-card ${
+                  role === "provider" ? "signup-role-card-active" : ""
+                }`}
+                onClick={() => setRole("provider")}
               >
-                <span className="role-card-title">Find work</span>
+                <span className="signup-role-title">Find work</span>
 
-                <span className="role-card-description">
+                <span className="signup-role-description">
                   I want to offer my skills and services.
                 </span>
               </button>
             </div>
           </div>
 
-          {/* MESSAGE */}
+          <div className="signup-field">
+            <label htmlFor="fullName">Full name</label>
+
+            <input
+              id="fullName"
+              type="text"
+              value={fullName}
+              onChange={(event) => setFullName(event.target.value)}
+              placeholder="Enter your full name"
+              autoComplete="name"
+            />
+          </div>
+
+          <div className="signup-field">
+            <label htmlFor="email">Email</label>
+
+            <input
+              id="email"
+              type="email"
+              value={email}
+              onChange={(event) => setEmail(event.target.value)}
+              placeholder="you@example.com"
+              autoComplete="email"
+            />
+          </div>
+
+          <div className="signup-field">
+            <label htmlFor="phone">Phone number</label>
+
+            <input
+              id="phone"
+              type="tel"
+              value={phone}
+              onChange={(event) => setPhone(event.target.value)}
+              placeholder="e.g. 0712345678"
+              autoComplete="tel"
+            />
+          </div>
+
+          <div className="signup-field">
+            <label htmlFor="password">Password</label>
+
+            <div className="signup-password-wrapper">
+              <input
+                id="password"
+                type={showPassword ? "text" : "password"}
+                value={password}
+                onChange={(event) => setPassword(event.target.value)}
+                placeholder="Create a password"
+                autoComplete="new-password"
+              />
+
+              <button
+                type="button"
+                className="signup-password-toggle"
+                onClick={() => setShowPassword((current) => !current)}
+              >
+                {showPassword ? "Hide" : "Show"}
+              </button>
+            </div>
+          </div>
+
+          <div className="signup-field">
+            <label htmlFor="confirmPassword">Confirm password</label>
+
+            <div className="signup-password-wrapper">
+              <input
+                id="confirmPassword"
+                type={showConfirmPassword ? "text" : "password"}
+                value={confirmPassword}
+                onChange={(event) => setConfirmPassword(event.target.value)}
+                placeholder="Confirm your password"
+                autoComplete="new-password"
+              />
+
+              <button
+                type="button"
+                className="signup-password-toggle"
+                onClick={() => setShowConfirmPassword((current) => !current)}
+              >
+                {showConfirmPassword ? "Hide" : "Show"}
+              </button>
+            </div>
+          </div>
+
+          <label className="signup-checkbox-row">
+            <input
+              type="checkbox"
+              checked={agreed}
+              onChange={(event) => setAgreed(event.target.checked)}
+            />
+
+            <span>
+              I agree to the <Link to="/terms">Terms & Conditions</Link> and
+              Privacy Policy
+            </span>
+          </label>
 
           {message && <div className="signup-message">{message}</div>}
 
-          {/* FORM */}
+          <button
+            type="submit"
+            className="signup-submit-button"
+            disabled={isSubmitting}
+          >
+            {isSubmitting ? "Creating account..." : "Create account"}
+          </button>
+        </form>
 
-          <form onSubmit={handleSubmit}>
-            {/* NAME */}
+        <div className="signup-footer">
+          <span>Already have an account?</span>
 
-            <div className="signup-form-group">
-              <label htmlFor="fullName">Full name</label>
-
-              <input
-                id="fullName"
-                type="text"
-                name="fullName"
-                placeholder="Enter your full name"
-                value={formData.fullName}
-                onChange={handleChange}
-                required
-              />
-            </div>
-
-            {/* EMAIL */}
-
-            <div className="signup-form-group">
-              <label htmlFor="email">Email</label>
-
-              <input
-                id="email"
-                type="email"
-                name="email"
-                placeholder="you@example.com"
-                value={formData.email}
-                onChange={handleChange}
-                required
-              />
-            </div>
-
-            {/* PHONE */}
-
-            <div className="signup-form-group">
-              <label htmlFor="phone">Phone number</label>
-
-              <input
-                id="phone"
-                type="tel"
-                name="phone"
-                placeholder="e.g. 0712345678"
-                value={formData.phone}
-                onChange={handleChange}
-                required
-              />
-            </div>
-
-            {/* PASSWORD */}
-
-            <div className="signup-form-group">
-              <label htmlFor="password">Password</label>
-
-              <div className="signup-password-wrapper">
-                <input
-                  id="password"
-                  type={showPassword ? "text" : "password"}
-                  name="password"
-                  placeholder="Create a password"
-                  value={formData.password}
-                  onChange={handleChange}
-                  minLength="6"
-                  required
-                />
-
-                <button
-                  type="button"
-                  className="password-toggle"
-                  onClick={() => setShowPassword(!showPassword)}
-                >
-                  {showPassword ? "Hide" : "Show"}
-                </button>
-              </div>
-            </div>
-
-            {/* CONFIRM PASSWORD */}
-
-            <div className="signup-form-group">
-              <label htmlFor="confirmPassword">Confirm password</label>
-
-              <div className="signup-password-wrapper">
-                <input
-                  id="confirmPassword"
-                  type={showConfirmPassword ? "text" : "password"}
-                  name="confirmPassword"
-                  placeholder="Confirm your password"
-                  value={formData.confirmPassword}
-                  onChange={handleChange}
-                  required
-                />
-
-                <button
-                  type="button"
-                  className="password-toggle"
-                  onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                >
-                  {showConfirmPassword ? "Hide" : "Show"}
-                </button>
-              </div>
-            </div>
-
-            {/* TERMS */}
-
-            <div className="terms">
-              <input
-                type="checkbox"
-                id="terms"
-                checked={termsAccepted}
-                onChange={(e) => setTermsAccepted(e.target.checked)}
-              />
-
-              <label htmlFor="terms">
-                I agree to the{" "}
-                <Link to="/terms" className="terms-link">
-                  Terms & Conditions
-                </Link>{" "}
-                and Privacy Policy
-              </label>
-            </div>
-
-            {/* BUTTON */}
-
-            <button
-              type="submit"
-              className="signup-button"
-              disabled={isLoading}
-            >
-              {isLoading
-                ? "Creating account..."
-                : formData.role === "provider"
-                  ? "Create provider account"
-                  : "Create account"}
-            </button>
-          </form>
-
-          <div className="signup-login">
-            <p>
-              Already have an account? <Link to="/">Sign in</Link>
-            </p>
-          </div>
+          <Link to="/">Sign in</Link>
         </div>
-      </div>
+      </main>
     </div>
   );
 }

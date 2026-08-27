@@ -1,5 +1,7 @@
 import React, { useState } from "react";
+
 import { Link, useNavigate } from "react-router-dom";
+
 import "./login.css";
 
 function Login() {
@@ -7,44 +9,43 @@ function Login() {
 
   const API_URL = import.meta.env.VITE_API_URL;
 
-  const [formData, setFormData] = useState({
-    email: "",
-    password: "",
-  });
+  const [email, setEmail] = useState("");
+
+  const [password, setPassword] = useState("");
 
   const [showPassword, setShowPassword] = useState(false);
+
   const [rememberMe, setRememberMe] = useState(true);
+
   const [message, setMessage] = useState("");
-  const [isLoading, setIsLoading] = useState(false);
 
-  const handleChange = (e) => {
-    setFormData({
-      ...formData,
-      [e.target.name]: e.target.value,
-    });
-  };
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
+  const handleSubmit = async (event) => {
+    event.preventDefault();
 
     setMessage("");
 
-    if (!API_URL) {
-      setMessage("The server address is not configured.");
+    if (!email.trim() || !password) {
+      setMessage("Please enter your email and password.");
+
       return;
     }
 
     try {
-      setIsLoading(true);
+      setIsSubmitting(true);
 
       const response = await fetch(`${API_URL}/api/auth/login`, {
         method: "POST",
+
         headers: {
           "Content-Type": "application/json",
         },
+
         body: JSON.stringify({
-          email: formData.email,
-          password: formData.password,
+          email: email.trim(),
+
+          password,
         }),
       });
 
@@ -52,6 +53,7 @@ function Login() {
 
       if (!response.ok) {
         setMessage(data.message || "Unable to sign in.");
+
         return;
       }
 
@@ -59,11 +61,11 @@ function Login() {
 
       localStorage.setItem("pataKaziUser", JSON.stringify(data.user));
 
-      /*
-      ========================================
-      SEND USER TO THE CORRECT DASHBOARD
-      ========================================
-      */
+      if (rememberMe) {
+        localStorage.setItem("pataKaziRememberEmail", email.trim());
+      } else {
+        localStorage.removeItem("pataKaziRememberEmail");
+      }
 
       if (data.user?.role === "provider") {
         navigate("/provider");
@@ -73,123 +75,124 @@ function Login() {
     } catch (error) {
       console.error("Login error:", error);
 
-      setMessage("Unable to connect to the server. Please try again.");
+      setMessage("Unable to connect to the server.");
     } finally {
-      setIsLoading(false);
+      setIsSubmitting(false);
     }
+  };
+
+  const handleForgotPassword = () => {
+    setMessage("Password reset is coming soon.");
   };
 
   return (
     <div className="login-page">
-      <div className="login-wrapper">
-        {/* BRAND */}
-        <div className="login-brand">
-          <Link to="/" className="login-brand-title">
+      <div className="login-shell">
+        <div className="login-brand-section">
+          <Link to="/" className="login-brand">
             Pata Kazi
           </Link>
 
-          <p>Find help. Find work. Get things done.</p>
+          <p className="login-tagline">
+            Find help. Find work. Get things done.
+          </p>
         </div>
 
-        {/* LOGIN CARD */}
-        <div className="login-card">
-          <div className="login-card-header">
+        <main className="login-card">
+          <div className="login-heading">
             <h1>Welcome back</h1>
 
             <p>Sign in to continue to your account.</p>
           </div>
 
-          {message && <div className="login-message">{message}</div>}
-
           <form onSubmit={handleSubmit} className="login-form">
-            {/* EMAIL */}
             <div className="login-field">
               <label htmlFor="email">Email address</label>
 
               <input
                 id="email"
                 type="email"
-                name="email"
+                value={email}
+                onChange={(event) => setEmail(event.target.value)}
                 placeholder="you@example.com"
-                value={formData.email}
-                onChange={handleChange}
                 autoComplete="email"
-                required
               />
             </div>
 
-            {/* PASSWORD */}
             <div className="login-field">
-              <div className="login-password-label">
+              <div className="login-password-label-row">
                 <label htmlFor="password">Password</label>
 
-                <button type="button" className="forgot-password-button">
+                <button
+                  type="button"
+                  className="login-forgot-button"
+                  onClick={handleForgotPassword}
+                >
                   Forgot password?
                 </button>
               </div>
 
-              <div className="login-password-input">
+              <div className="login-password-wrapper">
                 <input
                   id="password"
                   type={showPassword ? "text" : "password"}
-                  name="password"
+                  value={password}
+                  onChange={(event) => setPassword(event.target.value)}
                   placeholder="Enter your password"
-                  value={formData.password}
-                  onChange={handleChange}
                   autoComplete="current-password"
-                  required
                 />
 
                 <button
                   type="button"
-                  className="show-password-button"
-                  onClick={() => setShowPassword(!showPassword)}
+                  className="login-password-toggle"
+                  onClick={() => setShowPassword((current) => !current)}
                 >
                   {showPassword ? "Hide" : "Show"}
                 </button>
               </div>
             </div>
 
-            {/* REMEMBER */}
-            <label className="remember-row">
-              <input
-                type="checkbox"
-                checked={rememberMe}
-                onChange={(e) => setRememberMe(e.target.checked)}
-              />
+            <div className="login-options">
+              <label className="login-remember">
+                <input
+                  type="checkbox"
+                  checked={rememberMe}
+                  onChange={(event) => setRememberMe(event.target.checked)}
+                />
 
-              <span>Remember me</span>
-            </label>
+                <span>Remember me</span>
+              </label>
+            </div>
 
-            {/* SIGN IN */}
+            {message && <div className="login-message">{message}</div>}
+
             <button
               type="submit"
               className="login-submit-button"
-              disabled={isLoading}
+              disabled={isSubmitting}
             >
-              {isLoading ? "Signing in..." : "Sign in"}
+              {isSubmitting ? "Signing in..." : "Sign in"}
             </button>
           </form>
 
-          {/* DIVIDER */}
           <div className="login-divider">
-            <span></span>
-            <p>OR</p>
-            <span></span>
+            <span>OR</span>
           </div>
 
-          {/* GOOGLE */}
-          <button type="button" className="google-login-button">
+          <button
+            type="button"
+            className="login-google-button"
+            onClick={() => setMessage("Google sign-in is coming soon.")}
+          >
             Continue with Google
           </button>
 
-          {/* SIGNUP */}
-          <div className="login-create-account">
+          <div className="login-footer">
             <span>Don't have an account?</span>
 
             <Link to="/signup">Create account</Link>
           </div>
-        </div>
+        </main>
       </div>
     </div>
   );
