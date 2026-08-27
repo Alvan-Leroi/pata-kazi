@@ -142,6 +142,12 @@
   font-size: 12px;
 }
 
+.provider-job-message-success {
+  border-color: #3d493d;
+
+  background: #101710;
+}
+
 /* =========================
    LAYOUT
 ========================= */
@@ -470,6 +476,12 @@
   flex-direction: column;
 
   gap: 7px;
+
+  margin-top: 18px;
+}
+
+.provider-offer-form .provider-offer-field {
+  margin-top: 0;
 }
 
 .provider-offer-field label {
@@ -521,6 +533,8 @@
 
   width: 100%;
 
+  min-height: 52px;
+
   padding: 13px 16px;
 
   border: none;
@@ -539,17 +553,67 @@
 
   font-weight: 800;
 
+  line-height: 1.35;
+
   cursor: pointer;
+
+  transition:
+    background 0.2s ease,
+    transform 0.2s ease;
 }
 
 .provider-job-main-button:hover {
   background: #dddddd;
+
+  transform: translateY(-1px);
 }
 
 .provider-job-main-button:disabled {
   opacity: 0.6;
 
   cursor: not-allowed;
+
+  transform: none;
+}
+
+/* =========================
+   BUTTON SPACING
+========================= */
+
+.provider-job-main-button + .provider-job-main-button {
+  margin-top: 12px;
+}
+
+.provider-job-action-note + .provider-job-main-button {
+  margin-top: 16px;
+}
+
+.existing-offer-box + .provider-job-main-button {
+  margin-top: 16px;
+}
+
+.existing-offer-message + .provider-job-main-button {
+  margin-top: 16px;
+}
+
+/* =========================
+   PAYMENT AREA
+========================= */
+
+.provider-offer-field + .provider-job-action-note {
+  margin-top: 10px !important;
+}
+
+.provider-job-action-note + button.provider-job-main-button {
+  margin-top: 16px;
+}
+
+button.provider-job-main-button + a.provider-job-main-button {
+  margin-top: 12px;
+}
+
+.existing-offer-box + .provider-job-action-note {
+  margin-top: 14px !important;
 }
 
 /* =========================
@@ -658,16 +722,24 @@
   line-height: 1.6;
 }
 
-.provider-job-action-note {
-  margin: 14px 0 0 !important;
+/* =========================
+   ACTION NOTE / LIVE STATUS
+========================= */
 
-  color: #5f5f5f !important;
+.provider-job-action-note {
+  margin: 16px 0 0 !important;
+
+  color: #666666 !important;
 
   font-size: 10px !important;
 
-  line-height: 1.5 !important;
+  line-height: 1.55 !important;
 
   text-align: center;
+}
+
+.provider-job-main-button + .provider-job-action-note {
+  margin-top: 18px !important;
 }
 
 /* =========================
@@ -788,5 +860,13 @@
 
   .existing-offer-box {
     grid-template-columns: 1fr;
+  }
+
+  .provider-job-action-card {
+    padding: 22px;
+  }
+
+  .provider-job-main-button {
+    min-height: 50px;
   }
 }

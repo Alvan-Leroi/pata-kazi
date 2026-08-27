@@ -11,7 +11,7 @@ function ProviderAccount() {
 
   const token = localStorage.getItem("pataKaziToken");
 
-  const savedUser = JSON.parse(localStorage.getItem("pataKaziUser"));
+  const savedUser = JSON.parse(localStorage.getItem("pataKaziUser") || "null");
 
   const [activeSection, setActiveSection] = useState("overview");
 
@@ -543,15 +543,6 @@ function ProviderAccount() {
             <p>Completed work will be counted here.</p>
           </div>
         </div>
-
-        <div className="provider-account-note">
-          <strong>Payments are not connected yet</strong>
-
-          <p>
-            These values are placeholders until we add job completion and
-            payment tracking.
-          </p>
-        </div>
       </div>
     );
   };
@@ -649,8 +640,6 @@ function ProviderAccount() {
 
   return (
     <div className="provider-account-page">
-      {/* NAVBAR */}
-
       <nav className="provider-account-navbar">
         <div className="provider-account-navbar-container">
           <Link to="/provider" className="provider-account-logo">
@@ -667,11 +656,7 @@ function ProviderAccount() {
         </div>
       </nav>
 
-      {/* ACCOUNT LAYOUT */}
-
       <main className="provider-account-layout">
-        {/* SIDEBAR */}
-
         <aside className="provider-account-sidebar">
           <div className="provider-account-user">
             <div className="provider-account-avatar">
@@ -783,8 +768,6 @@ function ProviderAccount() {
             </button>
           </nav>
         </aside>
-
-        {/* CONTENT */}
 
         <section className="provider-account-content">
           {renderSection()}

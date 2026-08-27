@@ -11,7 +11,7 @@ function ProviderHome() {
 
   const token = localStorage.getItem("pataKaziToken");
 
-  const savedUser = JSON.parse(localStorage.getItem("pataKaziUser"));
+  const savedUser = JSON.parse(localStorage.getItem("pataKaziUser") || "null");
 
   const [jobs, setJobs] = useState([]);
 
@@ -31,6 +31,12 @@ function ProviderHome() {
 
   const providerFirstName = savedUser?.fullName?.split(" ")[0] || "Provider";
 
+  /*
+  ========================================
+  LOAD PROVIDER DATA
+  ========================================
+  */
+
   useEffect(() => {
     if (!token) {
       navigate("/");
@@ -45,12 +51,11 @@ function ProviderHome() {
     const loadProviderData = async () => {
       try {
         setJobsLoading(true);
+
         setMessage("");
 
         /*
-          ========================================
           LOAD OPEN JOBS
-          ========================================
           */
 
         const openResponse = await fetch(`${API_URL}/api/tasks/open`, {
@@ -72,9 +77,7 @@ function ProviderHome() {
         setJobs(Array.isArray(openData) ? openData : []);
 
         /*
-          ========================================
-          LOAD ASSIGNED JOBS
-          ========================================
+          LOAD ACTIVE JOBS
           */
 
         const myJobsResponse = await fetch(
@@ -109,6 +112,12 @@ function ProviderHome() {
     loadProviderData();
   }, [API_URL, navigate, savedUser?.role, token]);
 
+  /*
+  ========================================
+  FILTER JOBS
+  ========================================
+  */
+
   const filteredJobs = useMemo(() => {
     return jobs.filter((job) => {
       const searchMatch =
@@ -130,6 +139,12 @@ function ProviderHome() {
     providerServices.includes(job.category),
   );
 
+  /*
+  ========================================
+  LOGOUT
+  ========================================
+  */
+
   const handleLogout = () => {
     localStorage.removeItem("pataKaziToken");
 
@@ -138,8 +153,14 @@ function ProviderHome() {
     navigate("/");
   };
 
+  /*
+  ========================================
+  FORMATTERS
+  ========================================
+  */
+
   const formatBudget = (amount) => {
-    return Number(amount || 0).toLocaleString();
+    return Number(amount || 0).toLocaleString("en-KE");
   };
 
   const formatDate = (dateValue) => {
@@ -149,7 +170,9 @@ function ProviderHome() {
 
     return new Date(dateValue).toLocaleDateString("en-KE", {
       year: "numeric",
+
       month: "short",
+
       day: "numeric",
     });
   };
@@ -210,7 +233,9 @@ function ProviderHome() {
       </nav>
 
       <main>
-        {/* HERO */}
+        {/* =====================================
+            HERO
+        ====================================== */}
 
         <section className="provider-dashboard-hero">
           <div className="provider-dashboard-container">
@@ -222,8 +247,8 @@ function ProviderHome() {
               <h1>Welcome back, {providerFirstName}.</h1>
 
               <p>
-                Manage active work, communicate with customers, and find new
-                jobs near you.
+                Manage active work, communicate with customers, request
+                payments, and find new jobs near you.
               </p>
 
               <div className="provider-dashboard-actions">
@@ -260,7 +285,9 @@ function ProviderHome() {
           </div>
         </section>
 
-        {/* STATS */}
+        {/* =====================================
+            STATS
+        ====================================== */}
 
         <section className="provider-stats-section">
           <div className="provider-content-container">
@@ -302,7 +329,9 @@ function ProviderHome() {
           </div>
         </section>
 
-        {/* MY ACTIVE JOBS */}
+        {/* =====================================
+            MY ACTIVE JOBS
+        ====================================== */}
 
         <section className="provider-jobs-section" id="my-jobs">
           <div className="provider-content-container">
@@ -389,7 +418,7 @@ function ProviderHome() {
                         to={`/provider/job/${job._id}`}
                         className="provider-view-job-button"
                       >
-                        View Active Job
+                        Manage Job / Payment
                       </Link>
 
                       <Link
@@ -406,7 +435,9 @@ function ProviderHome() {
           </div>
         </section>
 
-        {/* SERVICES */}
+        {/* =====================================
+            SERVICES
+        ====================================== */}
 
         <section className="provider-services-section" id="services">
           <div className="provider-content-container">
@@ -463,7 +494,9 @@ function ProviderHome() {
           </div>
         </section>
 
-        {/* AVAILABLE JOBS */}
+        {/* =====================================
+            AVAILABLE JOBS
+        ====================================== */}
 
         <section
           className="provider-jobs-section provider-available-section"
@@ -485,19 +518,19 @@ function ProviderHome() {
                 type="text"
                 placeholder="Search jobs..."
                 value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
+                onChange={(event) => setSearchTerm(event.target.value)}
               />
 
               <input
                 type="text"
                 placeholder="Location..."
                 value={locationFilter}
-                onChange={(e) => setLocationFilter(e.target.value)}
+                onChange={(event) => setLocationFilter(event.target.value)}
               />
 
               <select
                 value={categoryFilter}
-                onChange={(e) => setCategoryFilter(e.target.value)}
+                onChange={(event) => setCategoryFilter(event.target.value)}
               >
                 <option value="">All services</option>
 

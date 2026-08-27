@@ -13,7 +13,7 @@ function CustomerOffers() {
 
   const token = localStorage.getItem("pataKaziToken");
 
-  const savedUser = JSON.parse(localStorage.getItem("pataKaziUser"));
+  const savedUser = JSON.parse(localStorage.getItem("pataKaziUser") || "null");
 
   const [task, setTask] = useState(null);
 
@@ -26,12 +26,6 @@ function CustomerOffers() {
   const [successMessage, setSuccessMessage] = useState("");
 
   const [acceptingId, setAcceptingId] = useState("");
-
-  /*
-  ========================================
-  SAFE JSON RESPONSE
-  ========================================
-  */
 
   const readResponse = async (response) => {
     const text = await response.text();
@@ -49,20 +43,8 @@ function CustomerOffers() {
     }
   };
 
-  /*
-  ========================================
-  LOAD OFFERS
-  ========================================
-  */
-
   useEffect(() => {
     const loadOffers = async () => {
-      /*
-      ------------------------------------
-      AUTH CHECK
-      ------------------------------------
-      */
-
       if (!token) {
         navigate("/");
         return;
@@ -70,6 +52,7 @@ function CustomerOffers() {
 
       if (savedUser?.role !== "customer") {
         navigate("/provider");
+
         return;
       }
 
@@ -83,11 +66,8 @@ function CustomerOffers() {
 
       try {
         setIsLoading(true);
+
         setError("");
-
-        console.log("Loading offers for task:", taskId);
-
-        console.log("Offers URL:", `${API_URL}/api/tasks/${taskId}/offers`);
 
         const response = await fetch(`${API_URL}/api/tasks/${taskId}/offers`, {
           method: "GET",
@@ -99,15 +79,8 @@ function CustomerOffers() {
 
         const data = await readResponse(response);
 
-        console.log("Offers response status:", response.status);
-
-        console.log("Offers response:", data);
-
         if (!response.ok) {
-          setError(
-            data.message ||
-              `Unable to load offers. Server returned ${response.status}.`,
-          );
+          setError(data.message || "Unable to load offers.");
 
           return;
         }
@@ -115,10 +88,10 @@ function CustomerOffers() {
         setTask(data.task || null);
 
         setOffers(Array.isArray(data.offers) ? data.offers : []);
-      } catch (error) {
-        console.error("Load offers error:", error);
+      } catch (loadError) {
+        console.error("Load offers error:", loadError);
 
-        setError(`Unable to connect to the server: ${error.message}`);
+        setError("Unable to connect to the server.");
       } finally {
         setIsLoading(false);
       }
@@ -126,12 +99,6 @@ function CustomerOffers() {
 
     loadOffers();
   }, [API_URL, navigate, savedUser?.role, taskId, token]);
-
-  /*
-  ========================================
-  ACCEPT OFFER
-  ========================================
-  */
 
   const handleAcceptOffer = async (offerId) => {
     const confirmed = window.confirm(
@@ -146,6 +113,7 @@ function CustomerOffers() {
       setAcceptingId(offerId);
 
       setError("");
+
       setSuccessMessage("");
 
       const response = await fetch(
@@ -161,33 +129,20 @@ function CustomerOffers() {
 
       const data = await readResponse(response);
 
-      console.log("Accept offer response:", data);
-
       if (!response.ok) {
         setError(data.message || "Unable to accept this offer.");
 
         return;
       }
 
-      /*
-        ----------------------------------
-        UPDATE TASK
-        ----------------------------------
-        */
-
       setTask(data.task);
-
-      /*
-        ----------------------------------
-        UPDATE OFFERS
-        ----------------------------------
-        */
 
       setOffers((currentOffers) =>
         currentOffers.map((offer) => {
           if (offer._id === offerId) {
             return {
               ...offer,
+
               status: "accepted",
             };
           }
@@ -195,6 +150,7 @@ function CustomerOffers() {
           if (offer.status === "pending") {
             return {
               ...offer,
+
               status: "declined",
             };
           }
@@ -203,21 +159,17 @@ function CustomerOffers() {
         }),
       );
 
-      setSuccessMessage("Provider selected successfully.");
-    } catch (error) {
-      console.error("Accept offer error:", error);
+      setSuccessMessage(
+        "Provider selected successfully. The provider can now request payment from you.",
+      );
+    } catch (acceptError) {
+      console.error("Accept offer error:", acceptError);
 
-      setError(`Unable to accept offer: ${error.message}`);
+      setError("Unable to accept offer.");
     } finally {
       setAcceptingId("");
     }
   };
-
-  /*
-  ========================================
-  LOGOUT
-  ========================================
-  */
 
   const handleLogout = () => {
     localStorage.removeItem("pataKaziToken");
@@ -227,14 +179,8 @@ function CustomerOffers() {
     navigate("/");
   };
 
-  /*
-  ========================================
-  FORMATTERS
-  ========================================
-  */
-
   const formatMoney = (amount) => {
-    return Number(amount || 0).toLocaleString();
+    return Number(amount || 0).toLocaleString("en-KE");
   };
 
   const formatDate = (dateValue) => {
@@ -249,11 +195,9 @@ function CustomerOffers() {
     });
   };
 
-  /*
-  ========================================
-  LOADING
-  ========================================
-  */
+  const acceptedOffer = offers.find((offer) => offer.status === "accepted");
+
+  const acceptedProvider = acceptedOffer?.providerId;
 
   if (isLoading) {
     return (
@@ -267,16 +211,8 @@ function CustomerOffers() {
     );
   }
 
-  /*
-  ========================================
-  PAGE
-  ========================================
-  */
-
   return (
     <div className="customer-offers-page">
-      {/* NAVBAR */}
-
       <nav className="customer-offers-navbar">
         <div className="customer-offers-navbar-container">
           <Link to="/home" className="customer-offers-logo">
@@ -300,19 +236,13 @@ function CustomerOffers() {
           ← Back to my tasks
         </Link>
 
-        {/* ERROR */}
-
         {error && <div className="customer-offers-message">{error}</div>}
-
-        {/* SUCCESS */}
 
         {successMessage && (
           <div className="customer-offers-message customer-offers-message-success">
             {successMessage}
           </div>
         )}
-
-        {/* TASK */}
 
         {task && (
           <section className="customer-offers-task">
@@ -350,17 +280,47 @@ function CustomerOffers() {
           </section>
         )}
 
-        {/* IF TASK COULD NOT LOAD */}
+        {task && acceptedOffer && (
+          <section className="accepted-provider-section">
+            <p className="customer-offers-label">Selected provider</p>
 
-        {!task && !error && (
-          <div className="customer-offers-empty">
-            <h3>Task could not be loaded</h3>
+            <h2>Provider confirmed</h2>
 
-            <p>Please return to your account and try again.</p>
-          </div>
+            <div className="accepted-provider-card">
+              <div className="customer-provider-avatar">
+                {acceptedProvider?.fullName?.charAt(0).toUpperCase() || "P"}
+              </div>
+
+              <div className="accepted-provider-info">
+                <h3>{acceptedProvider?.fullName || "Service Provider"}</h3>
+
+                <p>{acceptedProvider?.location || "Location not added"}</p>
+              </div>
+
+              <div className="accepted-provider-price">
+                <span>Agreed price</span>
+
+                <strong>KES {formatMoney(acceptedOffer.amount)}</strong>
+              </div>
+            </div>
+
+            <div className="customer-payment-awaiting">
+              <strong>Waiting for payment request</strong>
+
+              <p>
+                Your provider will send an M-PESA payment request when payment
+                is ready. The prompt will appear on your phone.
+              </p>
+            </div>
+
+            <Link
+              to={`/task/${taskId}/chat`}
+              className="customer-message-provider-link"
+            >
+              Message Provider
+            </Link>
+          </section>
         )}
-
-        {/* OFFERS */}
 
         {task && (
           <section className="customer-offers-section">
@@ -373,29 +333,15 @@ function CustomerOffers() {
                   received
                 </h2>
 
-                <p>
-                  Compare prices and messages from providers interested in your
-                  job.
-                </p>
+                <p>Compare provider offers and choose who you want to hire.</p>
               </div>
             </div>
 
-            {/* NO OFFERS */}
-
             {offers.length === 0 ? (
               <div className="customer-offers-empty">
-                <div className="customer-offers-empty-icon">0</div>
-
                 <h3>No offers yet</h3>
 
-                <p>
-                  When a provider clicks "I can do this job", their offer will
-                  appear here.
-                </p>
-
-                <Link to="/home" className="customer-offers-primary-button">
-                  Back home
-                </Link>
+                <p>Provider offers will appear here.</p>
               </div>
             ) : (
               <div className="customer-offers-grid">
@@ -411,8 +357,6 @@ function CustomerOffers() {
                       }`}
                       key={offer._id}
                     >
-                      {/* PROVIDER */}
-
                       <div className="customer-offer-top">
                         <div className="customer-provider-header">
                           <div className="customer-provider-avatar">
@@ -433,8 +377,6 @@ function CustomerOffers() {
                         </span>
                       </div>
 
-                      {/* DETAILS */}
-
                       <div className="customer-offer-details">
                         <div>
                           <span>Price</span>
@@ -451,31 +393,17 @@ function CustomerOffers() {
                         </div>
 
                         <div>
-                          <span>Offer sent</span>
+                          <span>Sent</span>
 
                           <strong>{formatDate(offer.createdAt)}</strong>
                         </div>
                       </div>
-
-                      {/* SERVICES */}
-
-                      {provider?.services?.length > 0 && (
-                        <div className="customer-provider-services">
-                          {provider.services.map((service) => (
-                            <span key={service}>{service}</span>
-                          ))}
-                        </div>
-                      )}
-
-                      {/* PROVIDER MESSAGE */}
 
                       <div className="customer-offer-message-box">
                         <span>Message from provider</span>
 
                         <p>{offer.message}</p>
                       </div>
-
-                      {/* ACTION */}
 
                       <div className="customer-offer-actions">
                         {offer.status === "accepted" ? (

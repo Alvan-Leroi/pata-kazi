@@ -21,8 +21,6 @@ function Payment() {
 
   const [payment, setPayment] = useState(null);
 
-  const [phoneNumber, setPhoneNumber] = useState(savedUser?.phone || "");
-
   const [isLoading, setIsLoading] = useState(true);
 
   const [isPaying, setIsPaying] = useState(false);
@@ -59,7 +57,7 @@ function Payment() {
 
   /*
   ========================================
-  LOAD TASK
+  AUTH CHECK
   ========================================
   */
 
@@ -71,6 +69,17 @@ function Payment() {
 
     if (savedUser?.role !== "customer") {
       navigate("/provider");
+    }
+  }, [navigate, savedUser?.role, token]);
+
+  /*
+  ========================================
+  LOAD TASK
+  ========================================
+  */
+
+  useEffect(() => {
+    if (!token || !API_URL || !taskId) {
       return;
     }
 
@@ -111,16 +120,16 @@ function Payment() {
     };
 
     loadTask();
-  }, [API_URL, navigate, savedUser?.role, taskId, token]);
+  }, [API_URL, taskId, token]);
 
   /*
   ========================================
-  LOAD EXISTING PAYMENT
+  LOAD PAYMENT STATUS
   ========================================
   */
 
   useEffect(() => {
-    if (!token || !taskId) {
+    if (!token || !API_URL || !taskId) {
       return;
     }
 
@@ -153,7 +162,7 @@ function Payment() {
 
   /*
   ========================================
-  REAL-TIME PAYMENT UPDATE
+  PAYMENT SOCKET
   ========================================
   */
 
@@ -179,6 +188,12 @@ function Payment() {
     });
 
     socket.on("disconnect", () => {
+      setSocketConnected(false);
+    });
+
+    socket.on("connect_error", (error) => {
+      console.error("Payment socket error:", error.message);
+
       setSocketConnected(false);
     });
 
@@ -218,12 +233,6 @@ function Payment() {
       }
     });
 
-    socket.on("connect_error", (error) => {
-      console.error("Payment socket error:", error.message);
-
-      setSocketConnected(false);
-    });
-
     return () => {
       socket.off("payment_updated");
 
@@ -235,7 +244,7 @@ function Payment() {
 
   /*
   ========================================
-  FORMAT NUMBER
+  FORMAT MONEY
   ========================================
   */
 
@@ -245,31 +254,22 @@ function Payment() {
 
   /*
   ========================================
-  NORMALIZE PHONE FOR DISPLAY
+  FORMAT CUSTOMER PHONE
   ========================================
   */
 
-  const normalizeDisplayPhone = (value) => {
-    return value.replace(/[^\d+]/g, "").slice(0, 13);
-  };
+  const displayPhone =
+    savedUser?.phone ||
+    payment?.phoneNumber ||
+    "Phone number saved to your account";
 
   /*
   ========================================
-  START M-PESA PAYMENT
+  START PAYMENT
   ========================================
   */
 
-  const handlePayment = async (event) => {
-    event.preventDefault();
-
-    if (!phoneNumber.trim()) {
-      setMessage("Enter the M-PESA phone number.");
-
-      setMessageType("error");
-
-      return;
-    }
-
+  const handlePayment = async () => {
     try {
       setIsPaying(true);
 
@@ -286,10 +286,18 @@ function Payment() {
           Authorization: `Bearer ${token}`,
         },
 
+        /*
+              IMPORTANT:
+
+              We send ONLY taskId.
+
+              Backend looks up the
+              authenticated customer's
+              phone number from MongoDB.
+              */
+
         body: JSON.stringify({
           taskId,
-
-          phoneNumber: phoneNumber.trim(),
         }),
       });
 
@@ -319,7 +327,9 @@ function Payment() {
         status: "pending",
       });
 
-      setMessage("M-PESA request sent. Check your phone and enter your PIN.");
+      setMessage(
+        `M-PESA request sent to ${data.phoneNumber}. Check the phone and enter the M-PESA PIN.`,
+      );
 
       setMessageType("info");
     } catch (error) {
@@ -380,8 +390,8 @@ function Payment() {
       </nav>
 
       <main className="payment-container">
-        <Link to="/home" className="payment-back-link">
-          ← Back to dashboard
+        <Link to={`/task/${taskId}/offers`} className="payment-back-link">
+          ← Back to job
         </Link>
 
         <div className="payment-layout">
@@ -391,7 +401,7 @@ function Payment() {
 
               <h1>Pay with M-PESA</h1>
 
-              <p>Complete your payment for this Pata Kazi job.</p>
+              <p>Complete payment for your selected service provider.</p>
             </div>
 
             {message && (
@@ -406,7 +416,7 @@ function Payment() {
 
                 <h2>Payment successful</h2>
 
-                <p>Your payment has been confirmed.</p>
+                <p>Your M-PESA payment has been confirmed.</p>
 
                 {payment?.mpesaReceiptNumber && (
                   <div className="payment-receipt">
@@ -424,25 +434,19 @@ function Payment() {
                 </Link>
               </div>
             ) : (
-              <form onSubmit={handlePayment} className="payment-form">
+              <div className="payment-form">
                 <div className="payment-field">
-                  <label htmlFor="mpesaPhone">M-PESA phone number</label>
+                  <label>M-PESA number</label>
 
-                  <input
-                    id="mpesaPhone"
-                    type="tel"
-                    value={phoneNumber}
-                    onChange={(event) =>
-                      setPhoneNumber(normalizeDisplayPhone(event.target.value))
-                    }
-                    placeholder="e.g. 0712345678"
-                    autoComplete="tel"
-                    disabled={isPaying || isPending}
-                  />
+                  <div className="payment-customer-phone">
+                    <span>Customer phone</span>
+
+                    <strong>{displayPhone}</strong>
+                  </div>
 
                   <small>
-                    Enter the Safaricom number that should receive the M-PESA
-                    prompt.
+                    The M-PESA prompt will be sent to the phone number saved on
+                    your customer account.
                   </small>
                 </div>
 
@@ -453,16 +457,19 @@ function Payment() {
                     <div>
                       <strong>Waiting for M-PESA</strong>
 
-                      <p>Check your phone and enter your M-PESA PIN.</p>
+                      <p>
+                        Check the customer's phone and enter the M-PESA PIN.
+                      </p>
                     </div>
                   </div>
                 ) : (
                   <button
-                    type="submit"
+                    type="button"
                     className="payment-submit-button"
                     disabled={isPaying}
+                    onClick={handlePayment}
                   >
-                    {isPaying ? "Sending request..." : "Pay with M-PESA"}
+                    {isPaying ? "Sending request..." : "Send M-PESA prompt"}
                   </button>
                 )}
 
@@ -474,7 +481,7 @@ function Payment() {
                     PIN is entered directly on your phone.
                   </p>
                 </div>
-              </form>
+              </div>
             )}
           </section>
 
@@ -503,6 +510,12 @@ function Payment() {
                   <strong>{task.assignedProviderId.fullName}</strong>
                 </div>
               )}
+
+              <div>
+                <span>Paying from</span>
+
+                <strong>Customer</strong>
+              </div>
             </div>
 
             <div className="payment-total">

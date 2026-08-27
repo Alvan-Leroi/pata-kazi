@@ -164,7 +164,7 @@
 }
 
 /* ========================================
-   MESSAGES
+   MESSAGE
 ======================================== */
 
 .payment-message {
@@ -228,49 +228,50 @@
   font-weight: 700;
 }
 
-.payment-field input {
-  width: 100%;
+.payment-field small {
+  color: #707070;
 
-  min-height: 50px;
+  font-size: 11px;
 
-  padding: 0 14px;
+  line-height: 1.5;
+}
+
+/* ========================================
+   CUSTOMER PHONE
+======================================== */
+
+.payment-customer-phone {
+  min-height: 58px;
+
+  padding: 11px 14px;
+
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  gap: 15px;
 
   border: 1px solid #343434;
 
   border-radius: 9px;
 
   background: #090909;
-  color: #ffffff;
-
-  font-family: inherit;
-
-  font-size: 15px;
-
-  outline: none;
-
-  transition: 0.2s ease;
 }
 
-.payment-field input::placeholder {
-  color: #5f5f5f;
-}
-
-.payment-field input:focus {
-  border-color: #686868;
-
-  background: #0e0e0e;
-}
-
-.payment-field input:disabled {
-  opacity: 0.65;
-}
-
-.payment-field small {
-  color: #686868;
+.payment-customer-phone span {
+  color: #717171;
 
   font-size: 11px;
 
-  line-height: 1.5;
+  text-transform: uppercase;
+}
+
+.payment-customer-phone strong {
+  color: #ffffff;
+
+  font-size: 15px;
+
+  text-align: right;
 }
 
 /* ========================================
@@ -314,7 +315,7 @@
 }
 
 /* ========================================
-   SECURITY NOTE
+   SECURITY
 ======================================== */
 
 .payment-security-note {
@@ -493,10 +494,18 @@
 
   font-size: 13px;
   font-weight: 900;
+
+  transition: 0.2s ease;
+}
+
+.payment-continue-button:hover {
+  background: #dddddd;
+
+  transform: translateY(-2px);
 }
 
 /* ========================================
-   SUMMARY CARD
+   SUMMARY
 ======================================== */
 
 .payment-summary-card {
@@ -684,6 +693,16 @@
 
   .payment-summary-card {
     padding: 19px;
+  }
+
+  .payment-customer-phone {
+    align-items: flex-start;
+
+    flex-direction: column;
+  }
+
+  .payment-customer-phone strong {
+    text-align: left;
   }
 }
 

@@ -15,16 +15,13 @@
   color: #ffffff;
 
   font-family: Arial, Helvetica, sans-serif;
-}
 
-/* =========================
-   NAVBAR
-========================= */
+  font-size: 15px;
+}
 
 .customer-offers-navbar {
   position: sticky;
   top: 0;
-
   z-index: 100;
 
   background: rgba(8, 8, 8, 0.96);
@@ -51,7 +48,7 @@
   text-decoration: none;
 
   font-size: 23px;
-  font-weight: 800;
+  font-weight: 900;
 }
 
 .customer-offers-nav-right {
@@ -66,32 +63,25 @@
 
   text-decoration: none;
 
-  font-size: 12px;
-}
-
-.customer-offers-nav-right a:hover {
-  color: #ffffff;
+  font-size: 13px;
 }
 
 .customer-offers-nav-right button {
-  padding: 9px 13px;
+  min-height: 39px;
+
+  padding: 0 13px;
 
   border: 1px solid #333333;
 
   border-radius: 8px;
 
   background: #111111;
-
   color: #ffffff;
 
   font-size: 12px;
 
   cursor: pointer;
 }
-
-/* =========================
-   CONTAINER
-========================= */
 
 .customer-offers-container {
   width: 100%;
@@ -111,16 +101,8 @@
 
   text-decoration: none;
 
-  font-size: 12px;
+  font-size: 13px;
 }
-
-.customer-offers-back:hover {
-  color: #ffffff;
-}
-
-/* =========================
-   MESSAGE
-========================= */
 
 .customer-offers-message {
   margin-bottom: 20px;
@@ -135,7 +117,7 @@
 
   color: #dddddd;
 
-  font-size: 12px;
+  font-size: 13px;
 }
 
 .customer-offers-message-success {
@@ -144,11 +126,9 @@
   background: #111711;
 }
 
-/* =========================
-   TASK
-========================= */
-
 .customer-offers-task {
+  margin-bottom: 28px;
+
   padding: 28px;
 
   border: 1px solid #292929;
@@ -156,33 +136,31 @@
   border-radius: 15px;
 
   background: #121212;
-
-  margin-bottom: 28px;
 }
 
 .customer-task-status {
-  display: inline-block;
+  min-height: 27px;
 
   margin-bottom: 14px;
 
-  padding: 6px 10px;
+  padding: 0 10px;
 
-  border-radius: 20px;
+  display: inline-flex;
+  align-items: center;
 
   border: 1px solid #373737;
 
-  color: #ffffff;
+  border-radius: 20px;
 
-  font-size: 9px;
-
+  font-size: 11px;
   font-weight: 800;
 
   text-transform: uppercase;
 }
 
-.customer-task-status-assigned {
+.customer-task-status-assigned,
+.customer-task-status-in-progress {
   background: #ffffff;
-
   color: #111111;
 }
 
@@ -192,26 +170,22 @@
   font-size: 31px;
 }
 
-.customer-offers-task > div > p {
-  max-width: 750px;
-
-  margin: 12px 0 0;
-
+.customer-offers-task p {
   color: #858585;
 
-  font-size: 13px;
+  font-size: 14px;
 
   line-height: 1.7;
 }
 
 .customer-task-meta {
+  margin-top: 22px;
+
   display: grid;
 
   grid-template-columns: repeat(3, 1fr);
 
   gap: 10px;
-
-  margin-top: 22px;
 }
 
 .customer-task-meta div {
@@ -231,21 +205,13 @@
 
   color: #666666;
 
-  font-size: 9px;
+  font-size: 11px;
 
   text-transform: uppercase;
 }
 
 .customer-task-meta strong {
-  font-size: 12px;
-}
-
-/* =========================
-   HEADING
-========================= */
-
-.customer-offers-section {
-  margin-top: 30px;
+  font-size: 13px;
 }
 
 .customer-offers-label {
@@ -253,13 +219,11 @@
 
   color: #686868;
 
-  font-size: 10px;
+  font-size: 11px;
 
   font-weight: 800;
 
   text-transform: uppercase;
-
-  letter-spacing: 1.3px;
 }
 
 .customer-offers-heading {
@@ -270,24 +234,14 @@
 .accepted-provider-section h2 {
   margin: 0;
 
-  font-size: 27px;
+  font-size: 28px;
 }
 
-.customer-offers-heading > div > p:last-child {
-  max-width: 650px;
-
-  margin: 10px 0 0;
-
+.customer-offers-heading p {
   color: #7d7d7d;
 
-  font-size: 12px;
-
-  line-height: 1.6;
+  font-size: 14px;
 }
-
-/* =========================
-   ACCEPTED PROVIDER
-========================= */
 
 .accepted-provider-section {
   margin-bottom: 32px;
@@ -307,7 +261,6 @@
   padding: 18px;
 
   display: flex;
-
   align-items: center;
 
   gap: 14px;
@@ -326,7 +279,7 @@
 .accepted-provider-info h3 {
   margin: 0 0 5px;
 
-  font-size: 14px;
+  font-size: 15px;
 }
 
 .accepted-provider-info p {
@@ -334,7 +287,7 @@
 
   color: #737373;
 
-  font-size: 10px;
+  font-size: 12px;
 }
 
 .accepted-provider-price {
@@ -346,7 +299,7 @@
 
   color: #666666;
 
-  font-size: 9px;
+  font-size: 10px;
 
   text-transform: uppercase;
 }
@@ -356,12 +309,58 @@
 
   margin-top: 5px;
 
-  font-size: 15px;
+  font-size: 17px;
 }
 
-/* =========================
-   OFFER GRID
-========================= */
+.customer-payment-awaiting {
+  margin-top: 15px;
+
+  padding: 14px;
+
+  border: 1px solid #303030;
+
+  border-radius: 9px;
+
+  background: #0b0b0b;
+}
+
+.customer-payment-awaiting strong {
+  font-size: 13px;
+}
+
+.customer-payment-awaiting p {
+  margin: 6px 0 0;
+
+  color: #777777;
+
+  font-size: 12px;
+
+  line-height: 1.6;
+}
+
+.customer-message-provider-link {
+  width: 100%;
+
+  min-height: 44px;
+
+  margin-top: 12px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  border: 1px solid #ffffff;
+
+  border-radius: 8px;
+
+  background: #ffffff;
+  color: #111111;
+
+  text-decoration: none;
+
+  font-size: 13px;
+  font-weight: 800;
+}
 
 .customer-offers-grid {
   display: grid;
@@ -379,14 +378,6 @@
   border-radius: 14px;
 
   background: #121212;
-
-  transition: 0.2s ease;
-}
-
-.customer-offer-card:hover {
-  border-color: #484848;
-
-  transform: translateY(-2px);
 }
 
 .customer-offer-card-accepted {
@@ -395,9 +386,6 @@
 
 .customer-offer-top {
   display: flex;
-
-  align-items: flex-start;
-
   justify-content: space-between;
 
   gap: 15px;
@@ -407,7 +395,6 @@
 
 .customer-provider-header {
   display: flex;
-
   align-items: center;
 
   gap: 11px;
@@ -415,21 +402,15 @@
 
 .customer-provider-avatar {
   width: 46px;
-
   height: 46px;
 
-  flex-shrink: 0;
-
   display: flex;
-
   align-items: center;
-
   justify-content: center;
 
   border-radius: 50%;
 
   background: #ffffff;
-
   color: #111111;
 
   font-weight: 800;
@@ -438,7 +419,7 @@
 .customer-provider-header h3 {
   margin: 0 0 4px;
 
-  font-size: 14px;
+  font-size: 15px;
 }
 
 .customer-provider-header p {
@@ -446,23 +427,19 @@
 
   color: #747474;
 
-  font-size: 10px;
+  font-size: 11px;
 }
-
-/* =========================
-   OFFER STATUS
-========================= */
 
 .customer-offer-status {
   padding: 5px 8px;
 
-  border-radius: 20px;
-
   border: 1px solid #363636;
+
+  border-radius: 20px;
 
   color: #aaaaaa;
 
-  font-size: 8px;
+  font-size: 10px;
 
   font-weight: 800;
 
@@ -479,18 +456,14 @@
   color: #666666;
 }
 
-/* =========================
-   DETAILS
-========================= */
-
 .customer-offer-details {
+  padding: 14px 0;
+
   display: grid;
 
   grid-template-columns: repeat(3, 1fr);
 
   gap: 8px;
-
-  padding: 14px 0;
 
   border-top: 1px solid #292929;
 
@@ -504,44 +477,14 @@
 
   color: #606060;
 
-  font-size: 8px;
+  font-size: 10px;
 
   text-transform: uppercase;
 }
 
 .customer-offer-details strong {
-  font-size: 11px;
+  font-size: 12px;
 }
-
-/* =========================
-   SERVICES
-========================= */
-
-.customer-provider-services {
-  display: flex;
-
-  flex-wrap: wrap;
-
-  gap: 6px;
-
-  margin-top: 15px;
-}
-
-.customer-provider-services span {
-  padding: 5px 8px;
-
-  border: 1px solid #303030;
-
-  border-radius: 20px;
-
-  color: #909090;
-
-  font-size: 9px;
-}
-
-/* =========================
-   MESSAGE
-========================= */
 
 .customer-offer-message-box {
   margin-top: 15px;
@@ -558,13 +501,11 @@
 .customer-offer-message-box span {
   color: #606060;
 
-  font-size: 8px;
+  font-size: 10px;
 
   font-weight: 800;
 
   text-transform: uppercase;
-
-  letter-spacing: 1px;
 }
 
 .customer-offer-message-box p {
@@ -572,14 +513,10 @@
 
   color: #a0a0a0;
 
-  font-size: 11px;
+  font-size: 13px;
 
   line-height: 1.6;
 }
-
-/* =========================
-   ACTION
-========================= */
 
 .customer-offer-actions {
   margin-top: 17px;
@@ -588,31 +525,20 @@
 .customer-accept-offer-button {
   width: 100%;
 
-  padding: 12px;
+  min-height: 43px;
 
   border: none;
 
   border-radius: 8px;
 
   background: #ffffff;
-
   color: #111111;
 
-  font-size: 11px;
+  font-size: 12px;
 
   font-weight: 800;
 
   cursor: pointer;
-}
-
-.customer-accept-offer-button:hover {
-  background: #dddddd;
-}
-
-.customer-accept-offer-button:disabled {
-  opacity: 0.6;
-
-  cursor: not-allowed;
 }
 
 .customer-offer-selected {
@@ -621,12 +547,11 @@
   border-radius: 8px;
 
   background: #ffffff;
-
   color: #111111;
 
   text-align: center;
 
-  font-size: 11px;
+  font-size: 12px;
 
   font-weight: 800;
 }
@@ -642,12 +567,8 @@
 
   text-align: center;
 
-  font-size: 10px;
+  font-size: 11px;
 }
-
-/* =========================
-   EMPTY
-========================= */
 
 .customer-offers-empty {
   padding: 55px 25px;
@@ -661,75 +582,13 @@
   text-align: center;
 }
 
-.customer-offers-empty-icon {
-  width: 55px;
-
-  height: 55px;
-
-  margin: 0 auto 17px;
-
-  display: flex;
-
-  align-items: center;
-
-  justify-content: center;
-
-  border-radius: 50%;
-
-  background: #ffffff;
-
-  color: #111111;
-
-  font-weight: 800;
-}
-
-.customer-offers-empty h3 {
-  margin: 0 0 8px;
-}
-
-.customer-offers-empty p {
-  max-width: 500px;
-
-  margin: 0 auto 20px;
-
-  color: #737373;
-
-  font-size: 11px;
-
-  line-height: 1.6;
-}
-
-.customer-offers-primary-button {
-  display: inline-block;
-
-  padding: 11px 16px;
-
-  border-radius: 8px;
-
-  background: #ffffff;
-
-  color: #111111;
-
-  text-decoration: none;
-
-  font-size: 11px;
-
-  font-weight: 800;
-}
-
-/* =========================
-   LOADING
-========================= */
-
 .customer-offers-loading {
   min-height: 100vh;
 
   display: flex;
-
   flex-direction: column;
 
   align-items: center;
-
   justify-content: center;
 
   gap: 14px;
@@ -739,7 +598,6 @@
 
 .customer-offers-spinner {
   width: 36px;
-
   height: 36px;
 
   border: 3px solid #333333;
@@ -757,10 +615,6 @@
   }
 }
 
-/* =========================
-   RESPONSIVE
-========================= */
-
 @media (max-width: 800px) {
   .customer-offers-grid {
     grid-template-columns: 1fr;
@@ -768,26 +622,11 @@
 }
 
 @media (max-width: 600px) {
-  .customer-offers-navbar-container {
-    padding: 14px 16px;
-  }
-
-  .customer-offers-nav-right a {
-    display: none;
-  }
-
   .customer-offers-container {
     padding: 35px 16px 70px;
   }
 
-  .customer-offers-task {
-    padding: 22px;
-  }
-
-  .customer-task-meta {
-    grid-template-columns: 1fr;
-  }
-
+  .customer-task-meta,
   .customer-offer-details {
     grid-template-columns: 1fr;
   }
