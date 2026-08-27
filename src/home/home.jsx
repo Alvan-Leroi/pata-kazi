@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 
 import { Link, useNavigate } from "react-router-dom";
 
@@ -11,7 +11,7 @@ function Home() {
 
   const token = localStorage.getItem("pataKaziToken");
 
-  const savedUser = JSON.parse(localStorage.getItem("pataKaziUser"));
+  const savedUser = JSON.parse(localStorage.getItem("pataKaziUser") || "null");
 
   const isLoggedIn = !!token;
 
@@ -20,6 +20,8 @@ function Home() {
   const [tasksLoading, setTasksLoading] = useState(false);
 
   const [tasksMessage, setTasksMessage] = useState("");
+
+  const observerRef = useRef(null);
 
   const categories = [
     "Cleaning",
@@ -30,6 +32,12 @@ function Home() {
     "Yard Work",
   ];
 
+  /*
+  ========================================
+  REDIRECT PROVIDERS
+  ========================================
+  */
+
   useEffect(() => {
     if (isLoggedIn && savedUser?.role === "provider") {
       navigate("/provider", {
@@ -37,6 +45,12 @@ function Home() {
       });
     }
   }, [isLoggedIn, navigate, savedUser?.role]);
+
+  /*
+  ========================================
+  LOAD CUSTOMER TASKS
+  ========================================
+  */
 
   useEffect(() => {
     const loadMyTasks = async () => {
@@ -46,6 +60,7 @@ function Home() {
 
       try {
         setTasksLoading(true);
+
         setTasksMessage("");
 
         const response = await fetch(`${API_URL}/api/tasks/mine`, {
@@ -77,6 +92,61 @@ function Home() {
     loadMyTasks();
   }, [API_URL, isLoggedIn, savedUser?.role, token]);
 
+  /*
+  ========================================
+  SCROLL REVEAL ANIMATIONS
+  ========================================
+  */
+
+  useEffect(() => {
+    const prefersReducedMotion = window.matchMedia(
+      "(prefers-reduced-motion: reduce)",
+    ).matches;
+
+    const animatedElements = document.querySelectorAll(
+      ".customer-scroll-reveal",
+    );
+
+    if (prefersReducedMotion) {
+      animatedElements.forEach((element) => {
+        element.classList.add("customer-reveal-visible");
+      });
+
+      return;
+    }
+
+    observerRef.current = new IntersectionObserver(
+      (entries, observer) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            entry.target.classList.add("customer-reveal-visible");
+
+            observer.unobserve(entry.target);
+          }
+        });
+      },
+      {
+        threshold: 0.14,
+
+        rootMargin: "0px 0px -60px 0px",
+      },
+    );
+
+    animatedElements.forEach((element) => {
+      observerRef.current.observe(element);
+    });
+
+    return () => {
+      observerRef.current?.disconnect();
+    };
+  }, [myTasks, tasksLoading]);
+
+  /*
+  ========================================
+  LOGOUT
+  ========================================
+  */
+
   const handleLogout = () => {
     localStorage.removeItem("pataKaziToken");
 
@@ -84,6 +154,12 @@ function Home() {
 
     navigate("/");
   };
+
+  /*
+  ========================================
+  FORMATTING
+  ========================================
+  */
 
   const formatBudget = (budget) => {
     return Number(budget || 0).toLocaleString();
@@ -101,12 +177,23 @@ function Home() {
     });
   };
 
+  /*
+  ========================================
+  DO NOT SHOW CUSTOMER HOME
+  TO PROVIDER
+  ========================================
+  */
+
   if (isLoggedIn && savedUser?.role === "provider") {
     return null;
   }
 
   return (
     <div className="home-page">
+      {/* =====================================
+          NAVBAR
+      ====================================== */}
+
       <nav className="navbar">
         <div className="navbar-container">
           <Link to="/home" className="logo">
@@ -166,21 +253,29 @@ function Home() {
       </nav>
 
       <main>
-        <section className="hero-section">
-          <div className="hero-content">
-            <span className="hero-badge">Local services made simple</span>
+        {/* =====================================
+            HERO
+        ====================================== */}
 
-            <h1>
+        <section className="hero-section">
+          <div className="hero-overlay"></div>
+
+          <div className="hero-content">
+            <span className="hero-badge hero-entry hero-entry-one">
+              Local services made simple
+            </span>
+
+            <h1 className="hero-entry hero-entry-two">
               Get help with the things
               <span> you need done.</span>
             </h1>
 
-            <p>
+            <p className="hero-entry hero-entry-three">
               Connect with trusted local service providers for everyday tasks,
               projects, and jobs.
             </p>
 
-            <div className="hero-actions">
+            <div className="hero-actions hero-entry hero-entry-four">
               <Link
                 to={isLoggedIn ? "/post-task" : "/signup"}
                 className="primary-button"
@@ -192,20 +287,33 @@ function Home() {
                 Find work
               </Link>
             </div>
+
+            <div className="search-box hero-entry hero-entry-five">
+              <input type="text" placeholder="What service do you need?" />
+
+              <input type="text" placeholder="Enter your location" />
+
+              <button type="button">Search</button>
+            </div>
           </div>
         </section>
+
+        {/* =====================================
+            MY TASKS
+        ====================================== */}
 
         {isLoggedIn && (
           <section className="my-tasks-section" id="my-tasks">
             <div className="my-tasks-container">
-              <div className="my-tasks-heading">
+              <div className="my-tasks-heading customer-scroll-reveal reveal-from-left">
                 <div>
                   <p className="my-tasks-label">Your activity</p>
 
                   <h2>My Posted Tasks</h2>
 
                   <p>
-                    View your posted jobs, provider offers, and active work.
+                    Manage your jobs, review provider offers, and communicate
+                    with providers you hire.
                   </p>
                 </div>
 
@@ -215,17 +323,19 @@ function Home() {
               </div>
 
               {tasksLoading && (
-                <div className="tasks-state-card">
+                <div className="tasks-state-card customer-scroll-reveal">
                   Loading your posted tasks...
                 </div>
               )}
 
               {!tasksLoading && tasksMessage && (
-                <div className="tasks-state-card">{tasksMessage}</div>
+                <div className="tasks-state-card customer-scroll-reveal">
+                  {tasksMessage}
+                </div>
               )}
 
               {!tasksLoading && !tasksMessage && myTasks.length === 0 && (
-                <div className="tasks-empty-card">
+                <div className="tasks-empty-card customer-scroll-reveal reveal-scale">
                   <div className="tasks-empty-icon">+</div>
 
                   <h3>You have not posted any tasks yet</h3>
@@ -240,13 +350,19 @@ function Home() {
 
               {!tasksLoading && !tasksMessage && myTasks.length > 0 && (
                 <div className="my-tasks-grid">
-                  {myTasks.map((task) => {
+                  {myTasks.map((task, index) => {
                     const canChat = ["assigned", "in-progress"].includes(
                       task.status,
                     );
 
                     return (
-                      <article className="home-task-card" key={task._id}>
+                      <article
+                        className="home-task-card customer-scroll-reveal reveal-card"
+                        key={task._id}
+                        style={{
+                          "--reveal-delay": `${(index % 4) * 90}ms`,
+                        }}
+                      >
                         <div className="home-task-card-top">
                           <span
                             className={`task-status task-status-${task.status}`}
@@ -266,14 +382,26 @@ function Home() {
                         </p>
 
                         <div className="home-task-meta">
-                          <span>{task.category}</span>
+                          <div>
+                            <span>Service</span>
 
-                          <span>{task.location}</span>
+                            <strong>{task.category}</strong>
+                          </div>
 
-                          <span>KES {formatBudget(task.budget)}</span>
+                          <div>
+                            <span>Location</span>
+
+                            <strong>{task.location}</strong>
+                          </div>
+
+                          <div>
+                            <span>Budget</span>
+
+                            <strong>KES {formatBudget(task.budget)}</strong>
+                          </div>
                         </div>
 
-                        {task.assignedProviderId?.fullName && canChat && (
+                        {canChat && task.assignedProviderId?.fullName && (
                           <div className="home-assigned-provider">
                             <span>Assigned provider</span>
 
@@ -317,6 +445,12 @@ function Home() {
                               </Link>
                             </>
                           )}
+
+                          {task.status === "completed" && (
+                            <div className="completed-task-label">
+                              Job completed
+                            </div>
+                          )}
                         </div>
                       </article>
                     );
@@ -327,8 +461,12 @@ function Home() {
           </section>
         )}
 
+        {/* =====================================
+            SERVICES
+        ====================================== */}
+
         <section className="services-section" id="services">
-          <div className="section-heading">
+          <div className="section-heading customer-scroll-reveal reveal-from-left">
             <p>Popular services</p>
 
             <h2>What do you need help with?</h2>
@@ -339,13 +477,19 @@ function Home() {
           </div>
 
           <div className="services-grid">
-            {categories.map((category) => (
-              <div className="service-card" key={category}>
+            {categories.map((category, index) => (
+              <article
+                className="service-card customer-scroll-reveal reveal-card"
+                key={category}
+                style={{
+                  "--reveal-delay": `${index * 90}ms`,
+                }}
+              >
                 <div className="service-icon">{category.charAt(0)}</div>
 
                 <h3>{category}</h3>
 
-                <p>Find trusted providers near you.</p>
+                <p>Find trusted providers near you for this service.</p>
 
                 <Link
                   to={isLoggedIn ? "/post-task" : "/signup"}
@@ -353,45 +497,101 @@ function Home() {
                 >
                   Explore
                 </Link>
-              </div>
+              </article>
             ))}
           </div>
         </section>
 
+        {/* =====================================
+            HOW IT WORKS
+        ====================================== */}
+
         <section className="how-section" id="how-it-works">
-          <div className="section-heading">
+          <div className="section-heading customer-scroll-reveal reveal-from-right">
             <p>How it works</p>
 
             <h2>Getting things done is simple</h2>
+
+            <span>
+              Post what you need, compare offers, and choose the provider who
+              works best for you.
+            </span>
           </div>
 
           <div className="steps-grid">
-            <div className="step-card">
+            <article
+              className="step-card customer-scroll-reveal reveal-card"
+              style={{
+                "--reveal-delay": "0ms",
+              }}
+            >
               <span>01</span>
 
               <h3>Post your task</h3>
 
-              <p>Tell us what you need done and where you need it.</p>
-            </div>
+              <p>
+                Tell us what you need done, where you need it, and your budget.
+              </p>
+            </article>
 
-            <div className="step-card">
+            <article
+              className="step-card customer-scroll-reveal reveal-card"
+              style={{
+                "--reveal-delay": "130ms",
+              }}
+            >
               <span>02</span>
 
               <h3>Receive offers</h3>
 
-              <p>Providers can send you their price and a short message.</p>
-            </div>
+              <p>Local providers send you their prices and messages.</p>
+            </article>
 
-            <div className="step-card">
+            <article
+              className="step-card customer-scroll-reveal reveal-card"
+              style={{
+                "--reveal-delay": "260ms",
+              }}
+            >
               <span>03</span>
 
               <h3>Choose a provider</h3>
 
-              <p>Compare offers and choose the provider that works for you.</p>
-            </div>
+              <p>
+                Select a provider, communicate, and get your task completed.
+              </p>
+            </article>
+          </div>
+        </section>
+
+        {/* =====================================
+            FINAL CTA
+        ====================================== */}
+
+        <section className="customer-final-cta">
+          <div className="customer-final-cta-inner customer-scroll-reveal reveal-scale">
+            <p className="customer-final-small">Ready when you are</p>
+
+            <h2>Have something that needs to get done?</h2>
+
+            <p>
+              Post your task and connect with local providers who are ready to
+              help.
+            </p>
+
+            <Link
+              to={isLoggedIn ? "/post-task" : "/signup"}
+              className="customer-final-button"
+            >
+              Post a task
+            </Link>
           </div>
         </section>
       </main>
+
+      {/* =====================================
+          FOOTER
+      ====================================== */}
 
       <footer className="footer">
         <div className="footer-container">

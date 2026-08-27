@@ -28,11 +28,13 @@ function Account() {
     const loadTasks = async () => {
       if (!API_URL) {
         setTasksMessage("The API address is not configured.");
+
         return;
       }
 
       try {
         setTasksLoading(true);
+
         setTasksMessage("");
 
         const response = await fetch(`${API_URL}/api/tasks/mine`, {
@@ -445,16 +447,6 @@ function Account() {
             </button>
           </div>
         </div>
-
-        <div className="security-note">
-          <strong>Password management</strong>
-
-          <p>
-            We can add a secure Change Password feature next. That requires a
-            backend endpoint so the password can be verified and updated safely
-            in MongoDB.
-          </p>
-        </div>
       </div>
     );
   };
@@ -481,6 +473,7 @@ function Account() {
   return (
     <div className="account-page">
       {/* NAVBAR */}
+
       <nav className="account-navbar">
         <div className="account-navbar-container">
           <Link to="/home" className="account-logo">
@@ -505,6 +498,7 @@ function Account() {
 
       <main className="account-layout">
         {/* SIDEBAR */}
+
         <aside className="account-sidebar">
           <div className="account-user-card">
             <div className="account-avatar">
@@ -592,6 +586,7 @@ function Account() {
         </aside>
 
         {/* CONTENT */}
+
         <section className="account-main-content">
           {renderActiveSection()}
         </section>
