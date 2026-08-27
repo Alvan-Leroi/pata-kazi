@@ -24,6 +24,7 @@
 .provider-job-navbar {
   position: sticky;
   top: 0;
+
   z-index: 100;
 
   background: rgba(8, 8, 8, 0.96);
@@ -33,6 +34,7 @@
 
 .provider-job-navbar-container {
   width: 100%;
+
   max-width: 1200px;
 
   margin: 0 auto;
@@ -40,7 +42,9 @@
   padding: 17px 25px;
 
   display: flex;
+
   align-items: center;
+
   justify-content: space-between;
 
   gap: 25px;
@@ -52,11 +56,13 @@
   text-decoration: none;
 
   font-size: 23px;
+
   font-weight: 800;
 }
 
 .provider-job-nav-right {
   display: flex;
+
   align-items: center;
 
   gap: 22px;
@@ -131,7 +137,7 @@
 
   background: #111111;
 
-  color: #d0d0d0;
+  color: #dddddd;
 
   font-size: 12px;
 }
@@ -145,7 +151,7 @@
 
   grid-template-columns:
     minmax(0, 1fr)
-    340px;
+    360px;
 
   gap: 30px;
 
@@ -172,7 +178,9 @@
 
 .provider-job-heading-top {
   display: flex;
+
   align-items: center;
+
   justify-content: space-between;
 
   gap: 20px;
@@ -190,6 +198,7 @@
   color: #111111;
 
   font-size: 10px;
+
   font-weight: 800;
 
   text-transform: uppercase;
@@ -317,6 +326,7 @@
   margin-top: 18px;
 
   display: flex;
+
   align-items: center;
 
   gap: 13px;
@@ -324,12 +334,15 @@
 
 .provider-job-customer-avatar {
   width: 46px;
+
   height: 46px;
 
   flex-shrink: 0;
 
   display: flex;
+
   align-items: center;
+
   justify-content: center;
 
   border-radius: 50%;
@@ -397,15 +410,17 @@
   font-size: 23px;
 }
 
-.provider-job-action-card > p:nth-of-type(2) {
-  margin: 12px 0 0;
-
+.provider-job-action-card > p {
   color: #858585;
 
   font-size: 12px;
 
   line-height: 1.6;
 }
+
+/* =========================
+   BUDGET
+========================= */
 
 .provider-job-budget-box {
   margin: 22px 0;
@@ -437,6 +452,70 @@
   font-size: 20px;
 }
 
+/* =========================
+   OFFER FORM
+========================= */
+
+.provider-offer-form {
+  display: flex;
+
+  flex-direction: column;
+
+  gap: 15px;
+}
+
+.provider-offer-field {
+  display: flex;
+
+  flex-direction: column;
+
+  gap: 7px;
+}
+
+.provider-offer-field label {
+  color: #dddddd;
+
+  font-size: 11px;
+
+  font-weight: 700;
+}
+
+.provider-offer-field input,
+.provider-offer-field textarea {
+  width: 100%;
+
+  padding: 12px 13px;
+
+  border: 1px solid #343434;
+
+  border-radius: 8px;
+
+  background: #090909;
+
+  color: #ffffff;
+
+  font-size: 12px;
+
+  outline: none;
+}
+
+.provider-offer-field textarea {
+  resize: vertical;
+
+  min-height: 110px;
+
+  line-height: 1.5;
+}
+
+.provider-offer-field input:focus,
+.provider-offer-field textarea:focus {
+  border-color: #666666;
+}
+
+/* =========================
+   MAIN BUTTON
+========================= */
+
 .provider-job-main-button {
   display: block;
 
@@ -467,30 +546,116 @@
   background: #dddddd;
 }
 
-.provider-job-save-button {
-  width: 100%;
+.provider-job-main-button:disabled {
+  opacity: 0.6;
 
-  margin-top: 9px;
-
-  padding: 12px 16px;
-
-  border: 1px solid #363636;
-
-  border-radius: 9px;
-
-  background: #0d0d0d;
-
-  color: #ffffff;
-
-  font-size: 12px;
-
-  font-weight: 700;
-
-  cursor: pointer;
+  cursor: not-allowed;
 }
 
-.provider-job-save-button:hover {
-  background: #1b1b1b;
+/* =========================
+   OFFER SENT
+========================= */
+
+.offer-sent-icon {
+  width: 52px;
+
+  height: 52px;
+
+  margin-bottom: 18px;
+
+  display: flex;
+
+  align-items: center;
+
+  justify-content: center;
+
+  border-radius: 50%;
+
+  background: #ffffff;
+
+  color: #111111;
+
+  font-size: 20px;
+
+  font-weight: 900;
+}
+
+.existing-offer-box {
+  margin-top: 22px;
+
+  padding: 15px;
+
+  display: grid;
+
+  grid-template-columns: 1fr 1fr;
+
+  gap: 15px;
+
+  border: 1px solid #303030;
+
+  border-radius: 10px;
+
+  background: #090909;
+}
+
+.existing-offer-box span {
+  display: block;
+
+  margin-bottom: 5px;
+
+  color: #666666;
+
+  font-size: 9px;
+
+  text-transform: uppercase;
+
+  letter-spacing: 0.8px;
+}
+
+.existing-offer-box strong {
+  color: #ffffff;
+
+  font-size: 13px;
+}
+
+.existing-offer-status {
+  text-transform: capitalize;
+}
+
+.existing-offer-message {
+  margin-top: 14px;
+
+  padding: 15px;
+
+  border: 1px solid #303030;
+
+  border-radius: 10px;
+
+  background: #090909;
+}
+
+.existing-offer-message span {
+  display: block;
+
+  margin-bottom: 8px;
+
+  color: #666666;
+
+  font-size: 9px;
+
+  text-transform: uppercase;
+
+  letter-spacing: 0.8px;
+}
+
+.existing-offer-message p {
+  margin: 0;
+
+  color: #b0b0b0;
+
+  font-size: 11px;
+
+  line-height: 1.6;
 }
 
 .provider-job-action-note {
@@ -539,9 +704,11 @@
   min-height: 100vh;
 
   display: flex;
+
   flex-direction: column;
 
   align-items: center;
+
   justify-content: center;
 
   gap: 14px;
@@ -551,6 +718,7 @@
 
 .provider-job-spinner {
   width: 36px;
+
   height: 36px;
 
   border: 3px solid #333333;
@@ -616,5 +784,9 @@
   .provider-job-description-section,
   .provider-job-customer-section {
     padding: 22px;
+  }
+
+  .existing-offer-box {
+    grid-template-columns: 1fr;
   }
 }

@@ -4,7 +4,6 @@ import Login from "./login/login";
 import Signup from "./signup/signup";
 
 import Home from "./home/home";
-
 import Account from "./account/account";
 
 import Terms from "./terms/terms";
@@ -16,6 +15,8 @@ import MatchingProviders from "./tasks/MatchingProviders";
 import ProviderHome from "./provider/ProviderHome";
 
 import ProviderJob from "./provider/ProviderJob";
+
+import ProviderAccount from "./provider/ProviderAccount";
 
 function App() {
   return (
@@ -39,13 +40,16 @@ function App() {
         {/* CUSTOMER POSTS TASK */}
         <Route path="/post-task" element={<PostTask />} />
 
-        {/* CUSTOMER MATCHING PROVIDERS */}
+        {/* CUSTOMER PROVIDER MATCHES */}
         <Route path="/task/:taskId/providers" element={<MatchingProviders />} />
 
         {/* PROVIDER HOME */}
         <Route path="/provider" element={<ProviderHome />} />
 
-        {/* PROVIDER JOB DETAILS */}
+        {/* PROVIDER ACCOUNT */}
+        <Route path="/provider-account" element={<ProviderAccount />} />
+
+        {/* PROVIDER JOB */}
         <Route path="/provider/job/:jobId" element={<ProviderJob />} />
       </Routes>
     </BrowserRouter>

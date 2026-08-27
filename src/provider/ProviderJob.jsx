@@ -17,13 +17,46 @@ function ProviderJob() {
 
   const [job, setJob] = useState(null);
 
+  const [existingOffer, setExistingOffer] = useState(null);
+
   const [isLoading, setIsLoading] = useState(true);
+
+  const [submittingOffer, setSubmittingOffer] = useState(false);
 
   const [message, setMessage] = useState("");
 
+  const [messageType, setMessageType] = useState("");
+
+  const [offerForm, setOfferForm] = useState({
+    amount: "",
+    message: "",
+  });
+
   /*
   ========================================
-  LOAD JOB
+  HELPER - SAFELY READ API RESPONSE
+  ========================================
+  */
+
+  const readResponse = async (response) => {
+    const text = await response.text();
+
+    if (!text) {
+      return {};
+    }
+
+    try {
+      return JSON.parse(text);
+    } catch {
+      return {
+        message: text,
+      };
+    }
+  };
+
+  /*
+  ========================================
+  LOAD JOB + EXISTING OFFER
   ========================================
   */
 
@@ -38,12 +71,27 @@ function ProviderJob() {
       return;
     }
 
-    const loadJob = async () => {
+    if (!API_URL) {
+      setMessage("The API address is not configured.");
+
+      setMessageType("error");
+
+      setIsLoading(false);
+
+      return;
+    }
+
+    const loadPage = async () => {
       try {
         setIsLoading(true);
+
         setMessage("");
 
-        const response = await fetch(`${API_URL}/api/tasks/${jobId}`, {
+        /*
+          LOAD JOB
+          */
+
+        const jobResponse = await fetch(`${API_URL}/api/tasks/${jobId}`, {
           method: "GET",
 
           headers: {
@@ -51,26 +99,185 @@ function ProviderJob() {
           },
         });
 
-        const data = await response.json();
+        const jobData = await readResponse(jobResponse);
 
-        if (!response.ok) {
-          setMessage(data.message || "Unable to load this job.");
+        if (!jobResponse.ok) {
+          setMessage(
+            jobData.message ||
+              `Unable to load job. Server returned ${jobResponse.status}.`,
+          );
+
+          setMessageType("error");
 
           return;
         }
 
-        setJob(data);
-      } catch (error) {
-        console.error("Load job error:", error);
+        setJob(jobData);
 
-        setMessage("Unable to connect to the server.");
+        setOfferForm((current) => ({
+          ...current,
+
+          amount: current.amount || jobData.budget || "",
+        }));
+
+        /*
+          CHECK FOR EXISTING OFFER
+          */
+
+        const offerResponse = await fetch(
+          `${API_URL}/api/tasks/${jobId}/my-offer`,
+          {
+            method: "GET",
+
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          },
+        );
+
+        const offerData = await readResponse(offerResponse);
+
+        if (offerResponse.ok && offerData.hasOffer) {
+          setExistingOffer(offerData.offer);
+        } else if (!offerResponse.ok) {
+          console.error("Unable to check existing offer:", offerData);
+        }
+      } catch (error) {
+        console.error("Load provider job error:", error);
+
+        setMessage(`Unable to load the job: ${error.message}`);
+
+        setMessageType("error");
       } finally {
         setIsLoading(false);
       }
     };
 
-    loadJob();
+    loadPage();
   }, [API_URL, jobId, navigate, savedUser?.role, token]);
+
+  /*
+  ========================================
+  OFFER FORM CHANGE
+  ========================================
+  */
+
+  const handleOfferChange = (e) => {
+    setOfferForm({
+      ...offerForm,
+
+      [e.target.name]: e.target.value,
+    });
+  };
+
+  /*
+  ========================================
+  SEND OFFER
+  ========================================
+  */
+
+  const handleOffer = async (e) => {
+    e.preventDefault();
+
+    setMessage("");
+    setMessageType("");
+
+    const amount = Number(offerForm.amount);
+
+    if (!offerForm.amount || Number.isNaN(amount) || amount <= 0) {
+      setMessage("Please enter a valid price.");
+
+      setMessageType("error");
+
+      return;
+    }
+
+    if (!offerForm.message.trim()) {
+      setMessage("Please include a short message for the customer.");
+
+      setMessageType("error");
+
+      return;
+    }
+
+    if (!token) {
+      setMessage("Your session has expired. Please sign in again.");
+
+      setMessageType("error");
+
+      return;
+    }
+
+    if (!API_URL) {
+      setMessage("The API address is not configured.");
+
+      setMessageType("error");
+
+      return;
+    }
+
+    try {
+      setSubmittingOffer(true);
+
+      console.log("Sending offer to:", `${API_URL}/api/tasks/${jobId}/offers`);
+
+      console.log("Offer:", {
+        amount,
+        message: offerForm.message,
+      });
+
+      const response = await fetch(`${API_URL}/api/tasks/${jobId}/offers`, {
+        method: "POST",
+
+        headers: {
+          "Content-Type": "application/json",
+
+          Authorization: `Bearer ${token}`,
+        },
+
+        body: JSON.stringify({
+          amount,
+
+          message: offerForm.message.trim(),
+        }),
+      });
+
+      const data = await readResponse(response);
+
+      console.log("Offer API status:", response.status);
+
+      console.log("Offer API response:", data);
+
+      if (!response.ok) {
+        setMessage(
+          data.message ||
+            `Unable to send offer. Server returned ${response.status}.`,
+        );
+
+        setMessageType("error");
+
+        if (data.offer) {
+          setExistingOffer(data.offer);
+        }
+
+        return;
+      }
+
+      setExistingOffer(data.offer);
+
+      setMessage(data.message || "Your offer has been sent to the customer.");
+
+      setMessageType("success");
+    } catch (error) {
+      console.error("Send offer error:", error);
+
+      setMessage(`Offer could not be sent: ${error.message}`);
+
+      setMessageType("error");
+    } finally {
+      setSubmittingOffer(false);
+    }
+  };
 
   /*
   ========================================
@@ -106,18 +313,6 @@ function ProviderJob() {
       month: "long",
       day: "numeric",
     });
-  };
-
-  /*
-  ========================================
-  TEMPORARY APPLY ACTION
-  ========================================
-  */
-
-  const handleOffer = () => {
-    setMessage(
-      "Offer functionality is coming next. For now, this job is available for you to review.",
-    );
   };
 
   /*
@@ -165,7 +360,15 @@ function ProviderJob() {
           ← Back to available jobs
         </Link>
 
-        {message && <div className="provider-job-message">{message}</div>}
+        {message && (
+          <div
+            className={`provider-job-message ${
+              messageType === "success" ? "provider-job-message-success" : ""
+            }`}
+          >
+            {message}
+          </div>
+        )}
 
         {!job ? (
           <div className="provider-job-empty">
@@ -179,7 +382,7 @@ function ProviderJob() {
           </div>
         ) : (
           <div className="provider-job-layout">
-            {/* MAIN JOB CONTENT */}
+            {/* JOB DETAILS */}
 
             <section className="provider-job-main">
               <div className="provider-job-heading">
@@ -249,42 +452,113 @@ function ProviderJob() {
               )}
             </section>
 
-            {/* SIDE ACTION CARD */}
+            {/* OFFER */}
 
             <aside className="provider-job-sidebar">
               <div className="provider-job-action-card">
-                <p className="provider-job-action-label">
-                  Interested in this job?
-                </p>
+                {existingOffer ? (
+                  <>
+                    <div className="offer-sent-icon">✓</div>
 
-                <h2>Offer to help</h2>
+                    <p className="provider-job-action-label">Offer sent</p>
 
-                <p>
-                  Let the customer know that you are interested in completing
-                  this job.
-                </p>
+                    <h2>You're interested</h2>
 
-                <div className="provider-job-budget-box">
-                  <span>Customer budget</span>
+                    <p>Your offer has been sent to the customer.</p>
 
-                  <strong>KES {formatBudget(job.budget)}</strong>
-                </div>
+                    <div className="existing-offer-box">
+                      <div>
+                        <span>Your price</span>
 
-                <button
-                  type="button"
-                  className="provider-job-main-button"
-                  onClick={handleOffer}
-                >
-                  I can do this job
-                </button>
+                        <strong>
+                          KES {formatBudget(existingOffer.amount)}
+                        </strong>
+                      </div>
 
-                <button type="button" className="provider-job-save-button">
-                  Save job
-                </button>
+                      <div>
+                        <span>Status</span>
 
-                <p className="provider-job-action-note">
-                  You will not be hired until the customer accepts your offer.
-                </p>
+                        <strong className="existing-offer-status">
+                          {existingOffer.status}
+                        </strong>
+                      </div>
+                    </div>
+
+                    <div className="existing-offer-message">
+                      <span>Your message</span>
+
+                      <p>{existingOffer.message}</p>
+                    </div>
+
+                    <p className="provider-job-action-note">
+                      The customer can review your offer and decide whether to
+                      hire you.
+                    </p>
+                  </>
+                ) : (
+                  <>
+                    <p className="provider-job-action-label">
+                      Interested in this job?
+                    </p>
+
+                    <h2>I can do this job</h2>
+
+                    <p>Send the customer your price and a short message.</p>
+
+                    <div className="provider-job-budget-box">
+                      <span>Customer budget</span>
+
+                      <strong>KES {formatBudget(job.budget)}</strong>
+                    </div>
+
+                    <form
+                      onSubmit={handleOffer}
+                      className="provider-offer-form"
+                    >
+                      <div className="provider-offer-field">
+                        <label htmlFor="amount">Your price (KES)</label>
+
+                        <input
+                          id="amount"
+                          name="amount"
+                          type="number"
+                          min="1"
+                          value={offerForm.amount}
+                          onChange={handleOfferChange}
+                          placeholder="Enter your price"
+                          required
+                        />
+                      </div>
+
+                      <div className="provider-offer-field">
+                        <label htmlFor="message">Message to customer</label>
+
+                        <textarea
+                          id="message"
+                          name="message"
+                          rows="5"
+                          maxLength="1000"
+                          value={offerForm.message}
+                          onChange={handleOfferChange}
+                          placeholder="Tell the customer why you are a good fit for this job."
+                          required
+                        />
+                      </div>
+
+                      <button
+                        type="submit"
+                        className="provider-job-main-button"
+                        disabled={submittingOffer}
+                      >
+                        {submittingOffer ? "Sending offer..." : "Send my offer"}
+                      </button>
+                    </form>
+
+                    <p className="provider-job-action-note">
+                      The customer must accept your offer before you are hired.
+                    </p>
+                  </>
+                )}
               </div>
             </aside>
           </div>
