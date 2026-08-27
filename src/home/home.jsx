@@ -1,15 +1,25 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
+
 import { Link, useNavigate } from "react-router-dom";
+
 import "./home.css";
 
 function Home() {
   const navigate = useNavigate();
+
+  const API_URL = import.meta.env.VITE_API_URL;
 
   const token = localStorage.getItem("pataKaziToken");
 
   const savedUser = JSON.parse(localStorage.getItem("pataKaziUser"));
 
   const isLoggedIn = !!token;
+
+  const [myTasks, setMyTasks] = useState([]);
+
+  const [tasksLoading, setTasksLoading] = useState(false);
+
+  const [tasksMessage, setTasksMessage] = useState("");
 
   const categories = [
     "Cleaning",
@@ -20,16 +30,99 @@ function Home() {
     "Yard Work",
   ];
 
+  /*
+  ========================================
+  REDIRECT PROVIDERS
+  ========================================
+  */
+
+  useEffect(() => {
+    if (isLoggedIn && savedUser?.role === "provider") {
+      navigate("/provider", {
+        replace: true,
+      });
+    }
+  }, [isLoggedIn, navigate, savedUser?.role]);
+
+  /*
+  ========================================
+  LOAD CUSTOMER TASKS
+  ========================================
+  */
+
+  useEffect(() => {
+    const loadMyTasks = async () => {
+      if (!isLoggedIn || !token || !API_URL || savedUser?.role === "provider") {
+        return;
+      }
+
+      try {
+        setTasksLoading(true);
+
+        setTasksMessage("");
+
+        const response = await fetch(`${API_URL}/api/tasks/mine`, {
+          method: "GET",
+
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+
+        const data = await response.json();
+
+        if (!response.ok) {
+          setTasksMessage(data.message || "Unable to load your posted tasks.");
+
+          return;
+        }
+
+        setMyTasks(Array.isArray(data) ? data : []);
+      } catch (error) {
+        console.error("Load tasks error:", error);
+
+        setTasksMessage("Unable to load your posted tasks.");
+      } finally {
+        setTasksLoading(false);
+      }
+    };
+
+    loadMyTasks();
+  }, [API_URL, isLoggedIn, token, savedUser?.role]);
+
   const handleLogout = () => {
     localStorage.removeItem("pataKaziToken");
+
     localStorage.removeItem("pataKaziUser");
 
     navigate("/");
   };
 
+  const formatBudget = (budget) => {
+    return Number(budget || 0).toLocaleString();
+  };
+
+  const formatDate = (dateValue) => {
+    if (!dateValue) {
+      return "";
+    }
+
+    return new Date(dateValue).toLocaleDateString();
+  };
+
+  /*
+  Provider should not render
+  customer page while redirecting
+  */
+
+  if (isLoggedIn && savedUser?.role === "provider") {
+    return null;
+  }
+
   return (
     <div className="home-page">
       {/* NAVBAR */}
+
       <nav className="navbar">
         <div className="navbar-container">
           <Link to="/home" className="logo">
@@ -41,6 +134,8 @@ function Home() {
 
             <a href="#how-it-works">How it works</a>
 
+            {isLoggedIn && <a href="#my-tasks">My Tasks</a>}
+
             {isLoggedIn && <Link to="/account">My Account</Link>}
 
             {!isLoggedIn && <Link to="/signup">Become a Provider</Link>}
@@ -49,8 +144,18 @@ function Home() {
           <div className="nav-actions">
             {isLoggedIn ? (
               <>
-                <Link to="/account" className="login-link">
-                  {savedUser?.fullName || "My Account"}
+                <Link to="/account" className="user-profile-link">
+                  <div className="user-avatar">
+                    {savedUser?.fullName?.charAt(0).toUpperCase() || "U"}
+                  </div>
+
+                  <div className="user-info">
+                    <span className="user-name">
+                      {savedUser?.fullName || "My Account"}
+                    </span>
+
+                    <small className="user-role">Customer</small>
+                  </div>
                 </Link>
 
                 <button
@@ -78,6 +183,7 @@ function Home() {
 
       <main>
         {/* HERO */}
+
         <section className="hero-section">
           <div className="hero-content">
             <span className="hero-badge">Local services made simple</span>
@@ -100,10 +206,7 @@ function Home() {
                 Find someone
               </Link>
 
-              <Link
-                to={isLoggedIn ? "/account" : "/signup"}
-                className="secondary-button"
-              >
+              <Link to="/signup" className="secondary-button">
                 Find work
               </Link>
             </div>
@@ -118,7 +221,100 @@ function Home() {
           </div>
         </section>
 
+        {/* CUSTOMER TASKS */}
+
+        {isLoggedIn && (
+          <section className="my-tasks-section" id="my-tasks">
+            <div className="my-tasks-container">
+              <div className="my-tasks-heading">
+                <div>
+                  <p className="my-tasks-label">Your activity</p>
+
+                  <h2>My Posted Tasks</h2>
+
+                  <p>
+                    View the jobs you have posted and check for available
+                    providers.
+                  </p>
+                </div>
+
+                <Link to="/post-task" className="new-task-button">
+                  + Post a new task
+                </Link>
+              </div>
+
+              {tasksLoading && (
+                <div className="tasks-state-card">
+                  Loading your posted tasks...
+                </div>
+              )}
+
+              {!tasksLoading && tasksMessage && (
+                <div className="tasks-state-card">{tasksMessage}</div>
+              )}
+
+              {!tasksLoading && !tasksMessage && myTasks.length === 0 && (
+                <div className="tasks-empty-card">
+                  <div className="tasks-empty-icon">+</div>
+
+                  <h3>You have not posted any tasks yet</h3>
+
+                  <p>When you post a job, it will appear here.</p>
+
+                  <Link to="/post-task" className="empty-post-task-button">
+                    Post your first task
+                  </Link>
+                </div>
+              )}
+
+              {!tasksLoading && !tasksMessage && myTasks.length > 0 && (
+                <div className="my-tasks-grid">
+                  {myTasks.map((task) => (
+                    <article className="home-task-card" key={task._id}>
+                      <div className="home-task-card-top">
+                        <span
+                          className={`task-status task-status-${task.status}`}
+                        >
+                          {task.status || "open"}
+                        </span>
+
+                        <span className="task-date">
+                          {formatDate(task.createdAt)}
+                        </span>
+                      </div>
+
+                      <h3>{task.title}</h3>
+
+                      <p className="home-task-description">
+                        {task.description}
+                      </p>
+
+                      <div className="home-task-meta">
+                        <span>{task.category}</span>
+
+                        <span>{task.location}</span>
+
+                        <span>KES {formatBudget(task.budget)}</span>
+                      </div>
+
+                      <div className="home-task-actions">
+                        <Link
+                          to={`/task/${task._id}/providers`}
+                          className="view-providers-button"
+                        >
+                          View available providers
+                        </Link>
+                      </div>
+                    </article>
+                  ))}
+                </div>
+              )}
+            </div>
+          </section>
+        )}
+
         {/* SERVICES */}
+
         <section className="services-section" id="services">
           <div className="section-heading">
             <p>Popular services</p>
@@ -151,6 +347,7 @@ function Home() {
         </section>
 
         {/* HOW IT WORKS */}
+
         <section className="how-section" id="how-it-works">
           <div className="section-heading">
             <p>How it works</p>
@@ -164,10 +361,7 @@ function Home() {
 
               <h3>Post your task</h3>
 
-              <p>
-                Tell us what you need done, where you need it, and when you need
-                it.
-              </p>
+              <p>Tell us what you need done and where you need it.</p>
             </div>
 
             <div className="step-card">
@@ -175,10 +369,7 @@ function Home() {
 
               <h3>Choose a provider</h3>
 
-              <p>
-                Review available service providers, prices, ratings, and
-                experience.
-              </p>
+              <p>Review available service providers.</p>
             </div>
 
             <div className="step-card">
@@ -186,39 +377,12 @@ function Home() {
 
               <h3>Get it done</h3>
 
-              <p>
-                Hire the provider that works for you and get your task
-                completed.
-              </p>
+              <p>Choose the provider who works for you.</p>
             </div>
-          </div>
-        </section>
-
-        {/* PROVIDER SECTION */}
-        <section className="provider-section">
-          <div className="provider-content">
-            <div>
-              <p className="provider-label">Earn with Pata Kazi</p>
-
-              <h2>Turn your skills into income.</h2>
-
-              <p className="provider-description">
-                Create your profile, choose the services you offer, and connect
-                with customers looking for your skills.
-              </p>
-            </div>
-
-            <Link
-              to={isLoggedIn ? "/account" : "/signup"}
-              className="provider-button"
-            >
-              Become a provider
-            </Link>
           </div>
         </section>
       </main>
 
-      {/* FOOTER */}
       <footer className="footer">
         <div className="footer-container">
           <div>

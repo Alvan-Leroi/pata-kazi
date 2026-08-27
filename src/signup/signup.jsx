@@ -1,5 +1,7 @@
 import React, { useState } from "react";
+
 import { Link, useNavigate } from "react-router-dom";
+
 import "./signup.css";
 
 function Signup() {
@@ -20,13 +22,25 @@ function Signup() {
 
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
+  const [termsAccepted, setTermsAccepted] = useState(false);
+
   const [message, setMessage] = useState("");
+
   const [isLoading, setIsLoading] = useState(false);
 
   const handleChange = (e) => {
+    const { name, value } = e.target;
+
     setFormData({
       ...formData,
-      [e.target.name]: e.target.value,
+      [name]: value,
+    });
+  };
+
+  const selectRole = (role) => {
+    setFormData({
+      ...formData,
+      role,
     });
   };
 
@@ -41,9 +55,21 @@ function Signup() {
       return;
     }
 
-    setIsLoading(true);
+    if (!termsAccepted) {
+      setMessage("Please accept the Terms & Conditions.");
+
+      return;
+    }
+
+    if (!API_URL) {
+      setMessage("The server address is not configured.");
+
+      return;
+    }
 
     try {
+      setIsLoading(true);
+
       const response = await fetch(`${API_URL}/api/auth/register`, {
         method: "POST",
 
@@ -53,16 +79,18 @@ function Signup() {
 
         body: JSON.stringify({
           fullName: formData.fullName,
+
           email: formData.email,
+
           phone: formData.phone,
+
           password: formData.password,
+
           role: formData.role,
         }),
       });
 
       const data = await response.json();
-
-      console.log("SIGNUP RESPONSE:", data);
 
       if (!response.ok) {
         setMessage(data.message || "Unable to create account.");
@@ -70,11 +98,39 @@ function Signup() {
         return;
       }
 
+      /*
+        ====================================
+        SAVE LOGIN TOKEN
+        ====================================
+        */
+
+      if (data.token) {
+        localStorage.setItem("pataKaziToken", data.token);
+      }
+
+      /*
+        ====================================
+        SAVE USER INFORMATION
+        ====================================
+        */
+
+      if (data.user) {
+        localStorage.setItem("pataKaziUser", JSON.stringify(data.user));
+      }
+
       setMessage("Account created successfully!");
 
-      setTimeout(() => {
-        navigate("/");
-      }, 1200);
+      /*
+        ====================================
+        REDIRECT BASED ON ROLE
+        ====================================
+        */
+
+      if (data.user?.role === "provider") {
+        navigate("/provider");
+      } else {
+        navigate("/home");
+      }
     } catch (error) {
       console.error("Signup error:", error);
 
@@ -87,69 +143,79 @@ function Signup() {
   return (
     <div className="signup-page">
       <div className="signup-container">
-        <div className="signup-brand">
-          <h1>Pata Kazi</h1>
+        {/* BRAND */}
 
-          <p>Find work. Find help. Get things done.</p>
+        <div className="signup-brand">
+          <Link to="/" className="signup-logo">
+            Pata Kazi
+          </Link>
+
+          <p>Find help. Find work. Get things done.</p>
         </div>
 
-        <div className="signup-card">
-          <h2>Create your account</h2>
+        {/* SIGNUP CARD */}
 
-          <p className="signup-subtitle">
-            Join Pata Kazi and get started today.
-          </p>
+        <div className="signup-card">
+          <div className="signup-header">
+            <h1>Create your account</h1>
+
+            <p>Join Pata Kazi and connect with people in your community.</p>
+          </div>
+
+          {/* ROLE SELECTION */}
+
+          <div className="role-section">
+            <p className="role-title">What would you like to do?</p>
+
+            <div className="role-options">
+              {/* CUSTOMER */}
+
+              <button
+                type="button"
+                className={
+                  formData.role === "customer"
+                    ? "role-card active"
+                    : "role-card"
+                }
+                onClick={() => selectRole("customer")}
+              >
+                <span className="role-card-title">Hire someone</span>
+
+                <span className="role-card-description">
+                  I need help getting something done.
+                </span>
+              </button>
+
+              {/* PROVIDER */}
+
+              <button
+                type="button"
+                className={
+                  formData.role === "provider"
+                    ? "role-card active"
+                    : "role-card"
+                }
+                onClick={() => selectRole("provider")}
+              >
+                <span className="role-card-title">Find work</span>
+
+                <span className="role-card-description">
+                  I want to offer my skills and services.
+                </span>
+              </button>
+            </div>
+          </div>
+
+          {/* MESSAGE */}
 
           {message && <div className="signup-message">{message}</div>}
 
+          {/* FORM */}
+
           <form onSubmit={handleSubmit}>
-            <div className="role-section">
-              <p>I want to:</p>
+            {/* NAME */}
 
-              <div className="role-options">
-                <label
-                  className={
-                    formData.role === "customer"
-                      ? "role-card active-role"
-                      : "role-card"
-                  }
-                >
-                  <input
-                    type="radio"
-                    name="role"
-                    value="customer"
-                    checked={formData.role === "customer"}
-                    onChange={handleChange}
-                  />
-
-                  <span>Hire someone</span>
-
-                  <small>I need help with a task</small>
-                </label>
-
-                <label
-                  className={
-                    formData.role === "provider"
-                      ? "role-card active-role"
-                      : "role-card"
-                  }
-                >
-                  <input
-                    type="radio"
-                    name="role"
-                    value="provider"
-                    checked={formData.role === "provider"}
-                    onChange={handleChange}
-                  />
-
-                  <span>Find work</span>
-
-                  <small>I want to offer services</small>
-                </label>
-              </div>
-            </div>
-
-            <div className="form-group">
+            <div className="signup-form-group">
               <label htmlFor="fullName">Full name</label>
 
               <input
@@ -163,38 +229,44 @@ function Signup() {
               />
             </div>
 
-            <div className="form-group">
-              <label htmlFor="email">Email address</label>
+            {/* EMAIL */}
+
+            <div className="signup-form-group">
+              <label htmlFor="email">Email</label>
 
               <input
                 id="email"
                 type="email"
                 name="email"
-                placeholder="Enter your email"
+                placeholder="you@example.com"
                 value={formData.email}
                 onChange={handleChange}
                 required
               />
             </div>
 
-            <div className="form-group">
+            {/* PHONE */}
+
+            <div className="signup-form-group">
               <label htmlFor="phone">Phone number</label>
 
               <input
                 id="phone"
                 type="tel"
                 name="phone"
-                placeholder="e.g. 0712 345 678"
+                placeholder="e.g. 0712345678"
                 value={formData.phone}
                 onChange={handleChange}
                 required
               />
             </div>
 
-            <div className="form-group">
+            {/* PASSWORD */}
+
+            <div className="signup-form-group">
               <label htmlFor="password">Password</label>
 
-              <div className="password-input-wrapper">
+              <div className="signup-password-wrapper">
                 <input
                   id="password"
                   type={showPassword ? "text" : "password"}
@@ -202,12 +274,13 @@ function Signup() {
                   placeholder="Create a password"
                   value={formData.password}
                   onChange={handleChange}
+                  minLength="6"
                   required
                 />
 
                 <button
                   type="button"
-                  className="show-password-button"
+                  className="password-toggle"
                   onClick={() => setShowPassword(!showPassword)}
                 >
                   {showPassword ? "Hide" : "Show"}
@@ -215,15 +288,17 @@ function Signup() {
               </div>
             </div>
 
-            <div className="form-group">
+            {/* CONFIRM PASSWORD */}
+
+            <div className="signup-form-group">
               <label htmlFor="confirmPassword">Confirm password</label>
 
-              <div className="password-input-wrapper">
+              <div className="signup-password-wrapper">
                 <input
                   id="confirmPassword"
                   type={showConfirmPassword ? "text" : "password"}
                   name="confirmPassword"
-                  placeholder="Enter your password again"
+                  placeholder="Confirm your password"
                   value={formData.confirmPassword}
                   onChange={handleChange}
                   required
@@ -231,7 +306,7 @@ function Signup() {
 
                 <button
                   type="button"
-                  className="show-password-button"
+                  className="password-toggle"
                   onClick={() => setShowConfirmPassword(!showConfirmPassword)}
                 >
                   {showConfirmPassword ? "Hide" : "Show"}
@@ -239,8 +314,15 @@ function Signup() {
               </div>
             </div>
 
+            {/* TERMS */}
+
             <div className="terms">
-              <input type="checkbox" id="terms" required />
+              <input
+                type="checkbox"
+                id="terms"
+                checked={termsAccepted}
+                onChange={(e) => setTermsAccepted(e.target.checked)}
+              />
 
               <label htmlFor="terms">
                 I agree to the{" "}
@@ -251,33 +333,30 @@ function Signup() {
               </label>
             </div>
 
+            {/* BUTTON */}
+
             <button
               type="submit"
               className="signup-button"
               disabled={isLoading}
             >
-              {isLoading ? "Creating account..." : "Create account"}
+              {isLoading
+                ? "Creating account..."
+                : formData.role === "provider"
+                  ? "Create provider account"
+                  : "Create account"}
             </button>
           </form>
 
-          <div className="divider">
-            <span>OR</span>
+          <div className="signup-login">
+            <p>
+              Already have an account? <Link to="/">Sign in</Link>
+            </p>
           </div>
-
-          <button type="button" className="google-button">
-            Continue with Google
-          </button>
-
-          <p className="login-text">
-            Already have an account? <Link to="/">Sign in</Link>
-          </p>
-
-          <p className="home-link-text">
-            <Link to="/home">Continue to homepage</Link>
-          </p>
         </div>
       </div>
     </div>
   );
 }
+
 export default Signup;

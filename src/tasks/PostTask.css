@@ -15,8 +15,57 @@
   color: #ffffff;
 
   font-family: Arial, Helvetica, sans-serif;
+}
 
-  padding: 60px 20px;
+.post-task-navbar {
+  background: rgba(8, 8, 8, 0.95);
+
+  border-bottom: 1px solid #242424;
+
+  position: sticky;
+  top: 0;
+
+  z-index: 100;
+}
+
+.post-task-nav-container {
+  max-width: 1200px;
+
+  margin: 0 auto;
+
+  padding: 18px 25px;
+
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.post-task-logo {
+  color: #ffffff;
+
+  text-decoration: none;
+
+  font-size: 24px;
+  font-weight: 800;
+}
+
+.post-task-nav-links {
+  display: flex;
+  align-items: center;
+
+  gap: 24px;
+}
+
+.post-task-nav-links a {
+  color: #999999;
+
+  text-decoration: none;
+
+  font-size: 14px;
+}
+
+.post-task-nav-links a:hover {
+  color: #ffffff;
 }
 
 .post-task-container {
@@ -24,6 +73,8 @@
   max-width: 760px;
 
   margin: 0 auto;
+
+  padding: 70px 20px 100px;
 }
 
 .post-task-heading {
@@ -69,7 +120,7 @@
 .task-message {
   margin-bottom: 22px;
 
-  padding: 12px 14px;
+  padding: 13px 15px;
 
   background: #0d0d0d;
 
@@ -154,6 +205,8 @@
   font-weight: 700;
 
   cursor: pointer;
+
+  transition: 0.2s ease;
 }
 
 .post-task-button:hover {
@@ -167,8 +220,8 @@
 }
 
 @media (max-width: 600px) {
-  .post-task-page {
-    padding: 40px 15px;
+  .post-task-container {
+    padding: 50px 15px 70px;
   }
 
   .post-task-card {

@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import "./PostTask.css";
 
 function PostTask() {
@@ -46,11 +46,17 @@ function PostTask() {
       return;
     }
 
+    if (!API_URL) {
+      setMessage("API address is not configured.");
+      return;
+    }
+
     try {
       setIsLoading(true);
 
       const response = await fetch(`${API_URL}/api/tasks`, {
         method: "POST",
+
         headers: {
           "Content-Type": "application/json",
           Authorization: `Bearer ${token}`,
@@ -67,22 +73,22 @@ function PostTask() {
 
       const data = await response.json();
 
+      console.log("TASK RESPONSE:", data);
+
       if (!response.ok) {
         setMessage(data.message || "Unable to create task.");
         return;
       }
 
-      setMessage("Task posted successfully.");
-
-      console.log("TASK CREATED:", data);
+      setMessage("Task posted successfully!");
 
       setTimeout(() => {
         navigate(`/task/${data.task._id}/providers`);
-      }, 800);
+      }, 700);
     } catch (error) {
       console.error("Task creation error:", error);
 
-      setMessage("Unable to connect to the server.");
+      setMessage("Unable to connect to the server. Please try again.");
     } finally {
       setIsLoading(false);
     }
@@ -90,15 +96,29 @@ function PostTask() {
 
   return (
     <div className="post-task-page">
-      <div className="post-task-container">
-        <div className="post-task-heading">
-          <p className="post-task-label">Pata Kazi</p>
+      <nav className="post-task-navbar">
+        <div className="post-task-nav-container">
+          <Link to="/home" className="post-task-logo">
+            Pata Kazi
+          </Link>
 
-          <h1>Post a task</h1>
+          <div className="post-task-nav-links">
+            <Link to="/home">Home</Link>
+
+            <Link to="/account">My Account</Link>
+          </div>
+        </div>
+      </nav>
+
+      <main className="post-task-container">
+        <div className="post-task-heading">
+          <p className="post-task-label">Find someone</p>
+
+          <h1>What do you need help with?</h1>
 
           <p>
-            Tell us what you need done and we’ll help you find matching service
-            providers.
+            Tell us about the task and we will look for service providers who
+            may be able to help.
           </p>
         </div>
 
@@ -113,7 +133,7 @@ function PostTask() {
                 id="title"
                 type="text"
                 name="title"
-                placeholder="e.g. Need help moving furniture"
+                placeholder="e.g. Need someone to clean my apartment"
                 value={formData.title}
                 onChange={handleChange}
                 required
@@ -130,7 +150,7 @@ function PostTask() {
                 onChange={handleChange}
                 required
               >
-                <option value="">Select a category</option>
+                <option value="">Select a service</option>
 
                 {categories.map((category) => (
                   <option key={category} value={category}>
@@ -141,15 +161,15 @@ function PostTask() {
             </div>
 
             <div className="task-form-group">
-              <label htmlFor="description">Description</label>
+              <label htmlFor="description">Describe the task</label>
 
               <textarea
                 id="description"
                 name="description"
-                placeholder="Describe what you need done..."
+                placeholder="Give providers some details about what you need done..."
                 value={formData.description}
                 onChange={handleChange}
-                rows="5"
+                rows="6"
                 required
               />
             </div>
@@ -194,7 +214,7 @@ function PostTask() {
             </button>
           </form>
         </div>
-      </div>
+      </main>
     </div>
   );
 }

@@ -13,6 +13,7 @@ function Login() {
   });
 
   const [showPassword, setShowPassword] = useState(false);
+  const [rememberMe, setRememberMe] = useState(true);
   const [message, setMessage] = useState("");
   const [isLoading, setIsLoading] = useState(false);
 
@@ -27,16 +28,20 @@ function Login() {
     e.preventDefault();
 
     setMessage("");
-    setIsLoading(true);
+
+    if (!API_URL) {
+      setMessage("The server address is not configured.");
+      return;
+    }
 
     try {
+      setIsLoading(true);
+
       const response = await fetch(`${API_URL}/api/auth/login`, {
         method: "POST",
-
         headers: {
           "Content-Type": "application/json",
         },
-
         body: JSON.stringify({
           email: formData.email,
           password: formData.password,
@@ -45,22 +50,26 @@ function Login() {
 
       const data = await response.json();
 
-      console.log("LOGIN RESPONSE:", data);
-
       if (!response.ok) {
         setMessage(data.message || "Unable to sign in.");
         return;
       }
 
-      // Store authentication token
       localStorage.setItem("pataKaziToken", data.token);
 
-      // Store basic user information
       localStorage.setItem("pataKaziUser", JSON.stringify(data.user));
 
-      setMessage("Login successful!");
+      /*
+      ========================================
+      SEND USER TO THE CORRECT DASHBOARD
+      ========================================
+      */
 
-      navigate("/home");
+      if (data.user?.role === "provider") {
+        navigate("/provider");
+      } else {
+        navigate("/home");
+      }
     } catch (error) {
       console.error("Login error:", error);
 
@@ -72,43 +81,54 @@ function Login() {
 
   return (
     <div className="login-page">
-      <div className="login-container">
+      <div className="login-wrapper">
+        {/* BRAND */}
         <div className="login-brand">
-          <h1>Pata Kazi</h1>
+          <Link to="/" className="login-brand-title">
+            Pata Kazi
+          </Link>
 
-          <p>Find work. Find help. Get things done.</p>
+          <p>Find help. Find work. Get things done.</p>
         </div>
 
+        {/* LOGIN CARD */}
         <div className="login-card">
-          <h2>Welcome back</h2>
+          <div className="login-card-header">
+            <h1>Welcome back</h1>
 
-          <p className="login-subtitle">Sign in to continue to your account.</p>
+            <p>Sign in to continue to your account.</p>
+          </div>
 
           {message && <div className="login-message">{message}</div>}
 
-          <form onSubmit={handleSubmit}>
-            <div className="form-group">
+          <form onSubmit={handleSubmit} className="login-form">
+            {/* EMAIL */}
+            <div className="login-field">
               <label htmlFor="email">Email address</label>
 
               <input
                 id="email"
                 type="email"
                 name="email"
-                placeholder="Enter your email"
+                placeholder="you@example.com"
                 value={formData.email}
                 onChange={handleChange}
+                autoComplete="email"
                 required
               />
             </div>
 
-            <div className="form-group">
-              <div className="password-label">
+            {/* PASSWORD */}
+            <div className="login-field">
+              <div className="login-password-label">
                 <label htmlFor="password">Password</label>
 
-                <a href="/forgot-password">Forgot password?</a>
+                <button type="button" className="forgot-password-button">
+                  Forgot password?
+                </button>
               </div>
 
-              <div className="password-input-wrapper">
+              <div className="login-password-input">
                 <input
                   id="password"
                   type={showPassword ? "text" : "password"}
@@ -116,6 +136,7 @@ function Login() {
                   placeholder="Enter your password"
                   value={formData.password}
                   onChange={handleChange}
+                  autoComplete="current-password"
                   required
                 />
 
@@ -129,28 +150,45 @@ function Login() {
               </div>
             </div>
 
-            <div className="remember-me">
-              <input type="checkbox" id="remember" />
+            {/* REMEMBER */}
+            <label className="remember-row">
+              <input
+                type="checkbox"
+                checked={rememberMe}
+                onChange={(e) => setRememberMe(e.target.checked)}
+              />
 
-              <label htmlFor="remember">Remember me</label>
-            </div>
+              <span>Remember me</span>
+            </label>
 
-            <button type="submit" className="login-button" disabled={isLoading}>
+            {/* SIGN IN */}
+            <button
+              type="submit"
+              className="login-submit-button"
+              disabled={isLoading}
+            >
               {isLoading ? "Signing in..." : "Sign in"}
             </button>
           </form>
 
-          <div className="divider">
-            <span>OR</span>
+          {/* DIVIDER */}
+          <div className="login-divider">
+            <span></span>
+            <p>OR</p>
+            <span></span>
           </div>
 
-          <button type="button" className="google-button">
+          {/* GOOGLE */}
+          <button type="button" className="google-login-button">
             Continue with Google
           </button>
 
-          <p className="signup-text">
-            Don't have an account? <Link to="/signup">Create account</Link>
-          </p>
+          {/* SIGNUP */}
+          <div className="login-create-account">
+            <span>Don't have an account?</span>
+
+            <Link to="/signup">Create account</Link>
+          </div>
         </div>
       </div>
     </div>
