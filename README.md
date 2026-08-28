@@ -1,4 +1,4 @@
-# Pata Kazi 🐰
+# Pata Kazi 
 
 **Pata Kazi** is a task-based platform that connects people who need help with everyday jobs to skilled individuals looking for work. Users can post tasks, browse available jobs, communicate with task workers, and hire someone to get the job done.
 
